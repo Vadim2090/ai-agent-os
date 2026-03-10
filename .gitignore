@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+*.env
+
+# Secrets
+credentials.json
+*.key
+*.pem
+
+# Claude Code local
+CLAUDE.local.md
+learnings-queue.json
