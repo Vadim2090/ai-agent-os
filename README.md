@@ -23,9 +23,10 @@ AI OS/                              ← Your single source of truth
 ├── IDEAS.md                        ← Idea backlog (not actionable yet)
 ├── knowledge-base/                 ← Reference material
 │   └── ai-agent-principles.md     ← 5 principles + 3 pillars
-├── memory/                         ← Session handoffs
+├── memory/                         ← Session handoffs + meeting log
 │   ├── handoff.md                 ← Last session summary + next steps
-│   └── handoff-history.md         ← Timeline of all sessions
+│   ├── handoff-history.md         ← Timeline of all sessions
+│   └── meetings.md               ← Distilled meeting decisions/actions
 └── projects/                       ← Your project folders
     └── {project-name}/
         ├── .claude/settings.local.json  ← Per-project permissions
@@ -40,6 +41,7 @@ AI OS/                              ← Your single source of truth
 └── skills/                         ← Installed skills
     ├── start/                     ← Session kickstart
     ├── finish/                    ← Session wrap-up
+    ├── meetings/                  ← Meeting sync (Granola, Otter, etc.)
     ├── claudeception/             ← Skill extraction from discoveries
     ├── claude-reflect/            ← Self-learning from corrections
     └── skill-creator/             ← Guide for creating new skills
@@ -65,6 +67,7 @@ This ensures no context is lost between sessions, regardless of which tool you u
 | Active state | `MEMORY.md` | Current projects, decisions, metrics | When state changes |
 | Session bridge | `memory/handoff.md` | Last session → next session | Every /finish |
 | History | `memory/handoff-history.md` | Scannable timeline | Every /finish |
+| Meetings | `memory/meetings.md` | Distilled meeting decisions/actions | On-demand via /meetings |
 | Ideas | `IDEAS.md` | Unscoped ideas | Ad hoc |
 
 ### 3. Self-Learning Loop
@@ -85,7 +88,17 @@ Claude solves non-obvious problem → /claudeception evaluates
 
 Skills are modular packages of knowledge that trigger automatically based on context.
 
-### 5. Automated Guardrails (Hooks)
+### 5. Meeting Integration
+
+```
+Meeting tool (Granola, Otter, etc.) ← source of truth for raw data
+    ↓ /meetings (on-demand sync)
+memory/meetings.md ← distilled decisions, actions, commitments only
+```
+
+Meetings are **not** auto-synced into session lifecycle. Run `/meetings` when you want to pull in recent meeting context. This keeps `/start` and `/finish` fast while ensuring meeting decisions are always accessible.
+
+### 6. Automated Guardrails (Hooks)
 
 Hooks run automatically on Claude Code events:
 
@@ -95,7 +108,7 @@ Hooks run automatically on Claude Code events:
 | `content-guard.sh` | After Write/Edit | Scans output for banned words/phrases |
 | `session-guard.sh` | Session start | Warns if handoff.md is stale (previous session not closed) |
 
-### 6. The 5 Principles
+### 7. The 5 Principles
 
 1. **Make everything visible to the agent** — all context in files, not in your head
 2. **Diagnose the environment, not the model** — fix tooling/docs, not the AI
@@ -114,10 +127,10 @@ Hooks run automatically on Claude Code events:
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/ai-os-template.git
+git clone https://github.com/Vadim2090/ai-agent-os.git
 
 # Run the setup script
-cd ai-os-template
+cd ai-agent-os
 chmod +x setup.sh
 ./setup.sh
 ```
@@ -198,6 +211,7 @@ This system is built on three pillars:
 | `knowledge-base/ai-agent-principles.md` | The 5 principles + 3 pillars |
 | `memory/handoff.md` | Last session summary and next steps |
 | `memory/handoff-history.md` | Condensed timeline of all sessions |
+| `memory/meetings.md` | Meeting decisions/actions log (synced via /meetings) |
 | `settings.json.template` | Claude Code settings with hooks pre-wired |
 
 ## Contributing
