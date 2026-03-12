@@ -51,9 +51,10 @@ AI OS/
 ├── IDEAS.md               # Ideas not yet promoted to projects
 ├── knowledge-base/        # Reference material
 │   └── ai-agent-principles.md
-├── memory/                # Session logs and handoffs
+├── memory/                # Session logs, handoffs, meeting log
 │   ├── handoff.md
-│   └── handoff-history.md
+│   ├── handoff-history.md
+│   └── meetings.md       # Distilled meeting decisions/actions (via /meetings)
 └── projects/              # All project folders
     └── {{project-name}}/
 ```
