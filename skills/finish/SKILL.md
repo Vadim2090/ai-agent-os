@@ -19,15 +19,9 @@ Create a short, descriptive session name based on what was accomplished.
 - Use the primary project/area worked on + the main action
 
 ### Phase 2: Summary
-Create/update `memory/handoff.md` with:
-- Session name (from Phase 1)
-- Session date
-- What was accomplished (bullet points)
-- Decisions made
-- Next steps (numbered, prioritized)
-- Carried-over items (flag if item appeared in previous handoff too)
 
-Then **append** a condensed entry to `memory/handoff-history.md` (prepend after the `---` header line, so newest is first). Format:
+**STEP 1 — Archive to history FIRST (mandatory before touching handoff.md):**
+Prepend a condensed entry to `memory/handoff-history.md` after the `---` header line (newest first). Format:
 
 ```
 ## [session name]
@@ -43,6 +37,16 @@ Then **append** a condensed entry to `memory/handoff-history.md` (prepend after 
 ```
 
 Keep history entries concise — no carried-over items, no full detail. The goal is a scannable timeline.
+
+**STEP 2 — Only after history is written, overwrite `memory/handoff.md`** with:
+- Session name (from Phase 1)
+- Session date
+- What was accomplished (bullet points)
+- Decisions made
+- Next steps (numbered, prioritized)
+- Carried-over items (flag if item appeared in previous handoff too)
+
+These two operations are always sequential: history first, then handoff.md. Never the reverse.
 
 ### Phase 3: Memory & Structure Check
 Review if anything from this session should update MEMORY.md:

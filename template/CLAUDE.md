@@ -107,3 +107,7 @@ See START.md for the full procedure.
 - Every session ends with /finish
 - Never mix multiple projects in one session
 - If switching projects, end current session first
+- **handoff.md and handoff-history.md are always updated together, in this order:**
+  1. Prepend condensed entry to `memory/handoff-history.md` FIRST
+  2. Then overwrite `memory/handoff.md`
+  - This order is mandatory — never overwrite handoff.md without first archiving to history.
