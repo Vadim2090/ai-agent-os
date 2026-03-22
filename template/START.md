@@ -9,15 +9,15 @@
 
 ### Step 1: Load Context
 
-Read these files — nothing else:
+Read these files:
 
 | File | What to extract |
 |------|-----------------|
 | `memory/handoff.md` | Last session summary, next steps, carried-over items |
-| `MEMORY.md` (first 50 lines) | Active projects, recent decisions |
+| `memory/wip.md` (if exists) | What's currently in flight in a parallel session |
 
-**Do NOT read:** CLAUDE.md (already loaded), IDEAS.md (not actionable),
-any project-specific files (not yet scoped).
+**Already loaded automatically:** CLAUDE.md, MEMORY.md (via auto-memory system — do not re-read).
+**Do NOT read:** IDEAS.md (not actionable), any project-specific files (not yet scoped).
 
 ### Display format:
 
@@ -26,6 +26,9 @@ SESSION CONTEXT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Last session: [name from handoff.md]
+
+In flight (if wip.md exists):
+- [session name from wip.md] — [what's in progress]
 
 Pending:
 - [Next Steps from handoff.md]
