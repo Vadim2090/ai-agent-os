@@ -1,6 +1,6 @@
 # AI Agent OS — Personal AI Operating System
 
-A complete, opinionated system for running AI coding agents (Claude Code, Cursor, etc.) as a **persistent operating system** with session memory, self-learning, automated guardrails, and a three-tier agent architecture.
+A complete, opinionated system for running **Claude Code** as a **persistent operating system** — with session memory, self-learning, automated guardrails, and a three-tier agent architecture. Core context files are plain markdown, portable to any agent.
 
 ## Why This Exists
 
@@ -11,25 +11,25 @@ AI coding agents are stateless by default. Every session starts from zero. This 
 - **Self-learning** — corrections are captured and applied to instructions via `/reflect`
 - **Skill extraction** — non-obvious discoveries become reusable skills via `/claudeception`
 - **Automated guardrails** — hooks enforce rules mechanically, not just documentation
-- **Multi-tool portability** — works across Claude Code, Cursor, and any CLAUDE.md-compatible agent
+- **Credential registry** — agent knows what APIs/tools it can access without asking
+- **Freshness enforcement** — drift detection on session start/end prevents stale context
 - **Agent tiers** — graduate workflows from interactive to fully autonomous
 
 ## System Architecture
 
 ```
 AI OS/                              ← Single source of truth
-├── CLAUDE.md                       ← Agent instructions (identity, tools, domain, guardrails)
+├── CLAUDE.md                       ← Agent instructions (identity, tools, rules, guardrails)
 ├── START.md                        ← Session kickstart procedure
-├── MEMORY.md                       ← Active projects, key decisions, patterns
 ├── IDEAS.md                        ← Idea backlog (not actionable yet)
+├── data/                           ← Structured data (SQLite, exports)
 ├── knowledge-base/                 ← Reference material
 │   └── ai-agent-principles.md     ← 5 principles + 3 pillars
 ├── memory/                         ← Session handoffs + meeting log
 │   ├── handoff.md                 ← Last session summary + next steps
 │   ├── handoff-history.md         ← Timeline of all sessions
-│   ├── wip.md                     ← Work-in-progress state (if mid-session)
 │   └── meetings.md               ← Distilled meeting decisions/actions
-└── projects/                       ← Your project folders
+└── projects/                       ← Your project folders (each with README.md)
     └── {project-name}/
 
 ~/.claude/                          ← Claude Code configuration
@@ -60,17 +60,27 @@ Every work session follows a strict open/close protocol:
 
 This ensures no context is lost between sessions, regardless of which tool you use. The `/checkpoint` command saves mid-session state for parallel sessions.
 
-### 2. Memory Hierarchy
+### 2. Memory Architecture
 
-| Layer | File | Purpose | Update frequency |
-|-------|------|---------|-----------------|
-| Instructions | `CLAUDE.md` | Who you are, how to work, domain rules | Rarely (via /reflect) |
-| Active state | `MEMORY.md` | Current projects, decisions, metrics | When state changes |
-| Session bridge | `memory/handoff.md` | Last session → next session | Every /finish |
-| Work-in-progress | `memory/wip.md` | Mid-session state for parallel contexts | Via /checkpoint |
-| History | `memory/handoff-history.md` | Scannable timeline | Every /finish |
-| Meetings | `memory/meetings.md` | Distilled meeting decisions/actions | On-demand via /meetings |
-| Ideas | `IDEAS.md` | Unscoped ideas | Ad hoc |
+Two separate memory systems serve different purposes:
+
+**System memory** (`.claude/projects/.../memory/`) — what the agent knows:
+
+| Layer | Loaded | Purpose |
+|-------|--------|---------|
+| `MEMORY.md` (index) | Every turn | Pure pointers to topic files — no inline data |
+| Topic files (`*.md`) | On demand | Detailed project state, API patterns, references |
+
+**Session memory** (`AI OS/memory/`) — continuity between sessions:
+
+| Layer | Loaded | Purpose |
+|-------|--------|---------|
+| `handoff.md` | On /start | Last session summary + next steps |
+| `handoff-history.md` | Never auto | Append-only timeline of all sessions |
+| `wip.md` | On /start | Mid-session state (created by /checkpoint) |
+| `meetings.md` | On demand | Distilled meeting decisions/actions |
+
+**Key design rule:** MEMORY.md index must be a pure pointer index — no inline data. Every line costs tokens on every turn. Data lives in topic files, loaded only when relevant.
 
 ### 3. Three-Tier Agent Architecture
 
@@ -171,10 +181,10 @@ The setup script will:
 
 ### Post-Setup
 
-1. **Edit `AI OS/CLAUDE.md`** — fill in your identity, tools, domain knowledge
-2. **Edit `AI OS/MEMORY.md`** — add your active projects
-3. **Configure `content-guard.sh`** — add your domain-specific banned words (or remove if not needed)
-4. **Start a session**: open Claude Code in `AI OS/` and say `/start`
+1. **Edit `AI OS/CLAUDE.md`** — fill in your identity, tools, domain knowledge, operational rules
+2. **Configure `content-guard.sh`** — add your domain-specific banned words (or remove if not needed)
+3. **Start a session**: open Claude Code in `AI OS/` and say `/start`
+4. **Build memory over time** — topic files accumulate naturally as you work on projects
 
 ## Design Philosophy
 
@@ -239,7 +249,7 @@ To promote a skill to autonomous execution:
 |------|---------|
 | `CLAUDE.md` | Main agent instructions — identity, workflow, domain, guardrails |
 | `START.md` | Session kickstart procedure (read by /start skill) |
-| `MEMORY.md` | Active project state, decisions, metrics |
+| `data/` | Structured data layer (SQLite, exports) |
 | `IDEAS.md` | Idea backlog |
 | `knowledge-base/ai-agent-principles.md` | The 5 principles + 3 pillars |
 | `memory/handoff.md` | Last session summary and next steps |
