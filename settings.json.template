@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/session-guard.sh"
+            "command": "~/.claude/hooks/finish-staleness-check.sh"
           }
         ]
       }

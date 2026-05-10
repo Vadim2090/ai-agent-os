@@ -77,9 +77,9 @@ else
   echo "  ✓ Created settings.json with hooks"
 fi
 
-# Step 6: Update session-guard path
+# Step 6: Update finish-staleness-check path
 echo "[5/5] Configuring paths..."
-GUARD_FILE="$HOOKS_DIR/session-guard.sh"
+GUARD_FILE="$HOOKS_DIR/finish-staleness-check.sh"
 if [ -f "$GUARD_FILE" ]; then
   # Replace the default path with actual install path
   if [[ "$(uname)" == "Darwin" ]]; then
@@ -87,7 +87,7 @@ if [ -f "$GUARD_FILE" ]; then
   else
     sed -i "s|\${AI_OS_PATH:-\$HOME/AI OS}|$AI_OS_PATH|g" "$GUARD_FILE"
   fi
-  echo "  ✓ Configured session-guard path"
+  echo "  ✓ Configured finish-staleness-check path"
 fi
 
 echo ""

@@ -39,3 +39,5 @@ Tell the user: "State saved to wip.md. You can switch contexts safely — any ne
 - `wip.md` is read by `/start` (if it exists) to show parallel session context
 - `/finish` deletes `wip.md` when the session ends
 - This is for mid-session saves, not session endings
+- Does NOT prepend to `sessions-history.md` (that's `/finish` only)
+- Does NOT touch `focus.md`, `inbox.md`, or `references.md`

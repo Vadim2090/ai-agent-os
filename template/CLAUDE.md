@@ -45,19 +45,29 @@ This folder (`AI OS/`) is my single source of truth.
 
 ```
 AI OS/
-├── CLAUDE.md              # This file (agent instructions)
-├── START.md               # Session kickstart procedure
-├── MEMORY.md              # Active projects, key decisions
-├── IDEAS.md               # Ideas not yet promoted to projects
-├── knowledge-base/        # Reference material
+├── CLAUDE.md                  # This file (agent instructions)
+├── START.md                   # Session kickstart procedure
+├── MEMORY.md                  # Active projects, key decisions
+├── IDEAS.md                   # Ideas not yet promoted to projects
+├── data/                      # Hybrid data layer (SQLite for structured data)
+├── knowledge-base/            # Reference material
 │   └── ai-agent-principles.md
-├── memory/                # Session logs, handoffs, meeting log
-│   ├── handoff.md
-│   ├── handoff-history.md
-│   └── meetings.md       # Distilled meeting decisions/actions (via /meetings)
-└── projects/              # All project folders
+├── memory/                    # 4-file memory model + meeting log
+│   ├── focus.md               # Active strategic streams (loaded at /start)
+│   ├── inbox.md               # GTD capture buffer (manual triggers only)
+│   ├── references.md          # Stable IDs, URLs, tokens (on-demand)
+│   ├── sessions-history.md    # Append-only timeline; top entry = "last session"
+│   └── meetings.md            # Distilled meeting decisions/actions (via /meetings)
+└── projects/                  # All project folders
     └── {{project-name}}/
 ```
+
+### Memory model rules
+- **Tasks live in your real task tracker** (Notion, Linear, etc.) — NOT in any memory file
+- **`focus.md`** holds streams (multi-week initiatives), not individual tasks
+- **`inbox.md`** is GTD: capture during work, process later. Never auto-loaded.
+- **`references.md`** is on-demand only — keep it lean
+- **`sessions-history.md`** is append-only. The top entry serves as "last session" via shell slice.
 
 ### Naming convention
 - Format: `org-shortname` in kebab-case (e.g., `acme-crm`, `acme-marketing`)
@@ -74,8 +84,9 @@ Work must continue seamlessly across tools (Claude Code, Cursor, Claude.ai, etc.
 **Principles:**
 1. No tool lock-in — this folder works with any AI agent
 2. Single source of truth — all context lives here, not in tool-specific locations
-3. Graceful handoffs — any AI picks up where another left off
+3. Graceful handoffs — any AI picks up where another left off via focus.md + top of sessions-history.md
 4. One project per session — don't mix contexts
+5. Tasks live in your task tracker, not in memory
 
 ## CURRENT TOOLS & INTEGRATIONS
 
@@ -108,7 +119,10 @@ See START.md for the full procedure.
 - Every session ends with /finish
 - Never mix multiple projects in one session
 - If switching projects, end current session first
-- **handoff.md and handoff-history.md are always updated together, in this order:**
-  1. Prepend condensed entry to `memory/handoff-history.md` FIRST
-  2. Then overwrite `memory/handoff.md`
-  - This order is mandatory — never overwrite handoff.md without first archiving to history.
+- **Memory model (4 files):**
+  - `focus.md` — active streams, loaded at /start
+  - `inbox.md` — GTD capture buffer, only loaded on explicit "show inbox" / "process inbox"
+  - `references.md` — stable IDs/URLs, only loaded on demand
+  - `sessions-history.md` — append-only timeline; top entry = last session (read at /start via awk slice)
+- /finish writes ONE file: prepends new entry to `sessions-history.md` via shell op. focus.md only edited if streams changed.
+- Tasks live in your real task tracker (Notion, Linear, etc.) — NOT in any memory file.
