@@ -203,6 +203,10 @@ The setup script will:
 4. Create a template `~/.claude/settings.json` (or merge with existing)
 5. Generate a starter `CLAUDE.md` with placeholder sections
 
+### Guided setup (recommended)
+
+Don't want to configure by hand? After cloning, **paste `ONBOARD.md` into a fresh Claude Code chat.** Claude will walk you through the whole setup interactively — filling in your `CLAUDE.md`, connecting your first MCP, installing skills, and running one real task end-to-end — one step at a time, verifying as it goes.
+
 ### Post-Setup
 
 1. **Edit `AI OS/CLAUDE.md`** — fill in your identity, tools, domain knowledge, operational rules
