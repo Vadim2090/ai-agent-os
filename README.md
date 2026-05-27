@@ -47,9 +47,13 @@ AI OS/                              ← Single source of truth
     ├── finish/                    ← Session wrap-up (single-file shell-prepend)
     ├── checkpoint/                ← Save mid-session state
     ├── meetings/                  ← Meeting sync (Granola, Otter, etc.)
+    ├── meeting-debrief/           ← Single-meeting analysis → next steps
     ├── system-health/             ← Service health checker
     ├── claudeception/             ← Skill extraction from discoveries
-    └── claude-reflect/            ← Self-learning from corrections
+    ├── claude-reflect/            ← Self-learning from corrections
+    ├── sprint-planning/           ← Build next sprint's agenda
+    ├── sprint-status/             ← Mid-sprint status update
+    └── remote-mcp-oauth-install/  ← OAuth MCP install troubleshooting
 ```
 
 ## Core Concepts
@@ -297,6 +301,10 @@ To promote a skill to autonomous execution:
 | `/system-health` | Check all configured services in one shot |
 | `/reflect` | Review corrections, propose CLAUDE.md updates |
 | `/claudeception` | Extract reusable skills from session discoveries |
+| `/sprint-planning` | Build the next sprint's agenda from focus + meetings + tasks |
+| `/sprint-status` | Mid-sprint status update (shipped / in-flight / blocked / unplanned) |
+| `/meeting-debrief` | Analyze one meeting → filtered next steps + task proposal |
+| `/remote-mcp-oauth-install` | Fix OAuth-gated remote MCP installs ("where are my tools?" gotcha) |
 
 ## Lessons From Three Months In
 
