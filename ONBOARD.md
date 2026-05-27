@@ -56,6 +56,12 @@ Steps:
 **Why**: MCPs let you act on my real tools — read my docs, post to chat, query my CRM —
 instead of me copy-pasting between apps.
 
+**First — credentials (before connecting anything):** help me set up one secrets file (e.g.
+`~/.env.local` or `~/.env.<company>`). `chmod 600` it; add `.env*` to my global gitignore. Keys go
+there — NEVER in a chat, a `.md` file, or git. If I paste a key into this chat, tell me to rotate it.
+Scripts load it; MCP configs need the token written **inline** (they can't read env files — keep
+those configs out of git too).
+
 Pick the 1-2 closest to my Phase-0 #3 task. Install them ONE AT A TIME. For each:
 1. Tell me what it unlocks, in one sentence.
 2. Give me the exact install command / connector step.
