@@ -1,18 +1,17 @@
 # Onboarding — paste this whole file into a fresh Claude Code chat
 
 > **Claude: onboard me the way a great product would.** Clear, one step at a time, explaining
-> *why* before each step, marking progress, and building to the moment my first real workflow
-> runs — that's the payoff, treat it as the goal. I already use Claude Code a little, so skip
-> what I already have. Don't dump the whole plan at once. Don't lecture. Make it feel easy and
-> a little exciting.
+> *why* before each step, marking progress, and building to the moment I have real skills running
+> on my own data. I already use Claude Code a little, so skip what I already have. Don't dump the
+> whole plan at once. Don't lecture. Make it feel easy and a little exciting.
 
 ## First, tell me where we're going
 
 Open with something like:
-> *"In about 45 minutes you'll walk away with four things: a CLAUDE.md that knows who you are,
-> your tools connected, a set of reusable skills, and — the whole point — **one real task from
-> your week running end-to-end in here**. We'll go one step at a time, and I'll skip anything
-> you've already set up. Ready?"*
+> *"In about 45 minutes you'll walk away with: your AI OS set up on this machine (a tidy home base
+> that makes me useful), your tools connected, and — the point — a **working skill built on your
+> real data** for a task you do regularly, plus the know-how to turn anything you repeat into a
+> one-command skill. We go one step at a time, and I'll skip whatever you've already set up. Ready?"*
 
 Then wait for me to say go. Don't proceed until I do.
 
@@ -22,38 +21,37 @@ Then wait for me to say go. Don't proceed until I do.
 2. **One step at a time. Verify before advancing.** Never paste the whole runbook at once.
 3. **Mark progress** — "✅ that's 1 of 5 done" — so it feels like motion.
 4. **Skip what I already have** (you'll learn that in Step 0).
-5. **The aha-moment is Step 5** (my first workflow). Everything before it is setup — keep it light and quick.
+5. **The payoff is Steps 4-5** — building real skills on my data. Everything before is setup; keep it light and quick.
 6. **If something breaks, debug it with me.** When it works, say so.
 
 ---
 
 ## Step 0 — Get to know me (2 min)
 
-**Why** (say it): *"So I tailor the rest to you and don't waste your time on things you've already got."*
+**Why** (say it): *"So I tailor the rest to you and don't waste time on things you've already got."*
 
 Ask me three questions, ONE AT A TIME:
 1. What do you already use Claude Code for today?
-2. Which tools do you want me to reach directly (e.g. Notion, Slack, your CRM, Google Sheets, email, a meeting-notes tool) — and which are already connected as MCPs?
-3. **What's one task you do every week that you wish ran itself?** ← this is the one that matters; we build it in Step 5.
+2. Which tools do you want me to reach directly (CRM, chat, sheets, email, meeting notes…) — and which are already connected as MCPs?
+3. **What's a task you repeat regularly and wish ran itself?** ← we'll build a version of this as your first skill.
 
-Then tell me the plan you picked from my answers (one short paragraph): which tools we'll connect, which workflow we'll build, what we'll skip.
+Then tell me the plan you picked from my answers (one short paragraph): what we'll set up, connect, and build; what we'll skip.
 
 ---
 
-## Step 1 — Your CLAUDE.md: teach me once, never repeat yourself (10 min)
+## Step 1 — Set up your AI OS on this machine (10 min)
 
-**Why**: *"This file is the first thing I read every session. Spend 10 minutes here and you'll never
-re-explain who you are, how you like things, or what to never say — ever again."*
+**Why**: *"I work best with a tidy home base — one folder that holds who you are, your memory, and
+your skills. Let's create it properly so everything after just works."*
 
-1. If I haven't yet, have me run `./setup.sh` from this repo to create the `AI OS/` folder + install hooks and skills.
-2. Open the generated `CLAUDE.md` and **interview me**, one question at a time:
-   - Name, role, what I'm driving (2-3 streams)
-   - How I like outputs (tables? exec-summary-first? forwardable-as-is?)
-   - Anything you must never say
-   - Key teammates + what they own
-3. Write it in. Show me the result. Confirm it reads back right.
+1. If I haven't yet, have me run `./setup.sh` from this repo.
+2. **Verify the structure** — show me the tree and confirm each piece exists, explaining each in one line:
+   - `~/AI OS/` → `CLAUDE.md`, `memory/` (focus.md, inbox.md, references.md, sessions-history.md, meetings.md), `knowledge-base/`, `projects/`
+   - `~/.claude/skills/` (bundled skills), `~/.claude/hooks/` (guardrails), `~/.claude/settings.json` (hooks wired)
+   If anything's missing, fix it with me before moving on — the rest assumes this layout.
+3. **Write my CLAUDE.md** — interview me one question at a time: name, role, what I'm driving (2-3 streams), how I like outputs, anything you must never say, key teammates + what they own. Write it in, show me, confirm it reads back right.
 
-✅ **Win 1**: *"Now I know who you are on every future session — you'll never type this again."*
+✅ **Win 1**: *"Your AI OS is set up and I know who you are. This folder is your home base now."*
 
 ---
 
@@ -75,20 +73,16 @@ Walk me through it:
 
 We'll drop actual keys in as we connect each tool in Step 3 — for now just create the empty, locked file.
 
-✅ **Win 2**: *"Keys live in one safe place. From here on, connecting any tool is a 2-minute job."*
+✅ **Win 2**: *"Keys live in one safe place. From here, connecting any tool is a 2-minute job."*
 
 ---
 
-## Step 3 — Connect your tools (10 min)
+## Step 3 — Connect the tools your first skill needs (10 min)
 
-**Why**: *"This is what makes me more than a chatbot — now I can read your CRM, post to chat,
-pull your sheets, instead of you copy-pasting between tabs."*
+**Why**: *"Your first skill (next step) is the recurring task from Step 0 — so let's wire the tools it
+needs: wherever its data lives (your CRM, analytics, sheets) and wherever its output goes (chat, docs)."*
 
-Connect the 1-2 MCPs closest to my Step-0 #3 task. ONE AT A TIME. For each:
-1. One sentence on what it unlocks.
-2. The exact install / connector step, and where the key goes (into the secrets file, or inline for an MCP config).
-3. Wait for me to confirm it's connected.
-4. **Verify with a tiny real read** ("list my last 3 pages", "read the last 5 messages in a channel"). Advance only when it works.
+Connect them ONE AT A TIME. For each: one line on what it unlocks → the install/connector step + where the key goes → wait for me to confirm → **verify with a tiny real read** before advancing.
 
 Common gotchas to flag so I don't trip:
 - **Google Sheets** = service account + share the sheet with its email (a programmatic identity, not a person).
@@ -97,43 +91,57 @@ Common gotchas to flag so I don't trip:
 - **Remote OAuth MCPs** usually need a Claude Code **restart** before their tools appear.
 - **CRM built-in reports** often fold in bulk-cleanup + test records — pull raw and compute yourself for real analysis.
 
-✅ **Win 3**: *"Your tools are wired in. I can act on your real data now."*
+✅ **Win 3**: *"Tools wired and verified. Now we build something real."*
 
 ---
 
-## Step 4 — Install the skills (5 min)
+## Step 4 — Configure your first skill: a report you run regularly (15 min)
 
-**Why**: *"Skills are reusable workflows you run with `/name`. Build once, run forever. This is
-where the leverage lives — not in clever one-off prompts."*
+> **The first real payoff.** We'll take the recurring task you named in Step 0 and turn it into a
+> skill you run with one command. I'll lead this one so you see exactly how a skill gets built — then
+> in Step 5 you drive.
 
-1. `setup.sh` copied this repo's `skills/` into `~/.claude/skills/`. Have me type `/` and confirm `/start`, `/finish`, `/sprint-planning`, `/meeting-debrief` show up.
-2. Point out the 1-2 most relevant to my Step-0 task. Don't list them all.
+**Why**: *"Turn the task into a `/command` once, and from then on it's one keystroke on live data —
+no more manual pulling and pasting."*
 
-✅ **Win 4**: *"You've got a starter toolbox. Now we make one of these do your real work."*
+**Plan it WITH me first** (don't run yet — show me the steps + which data/fields you'll use, let me adjust):
+1. **Pull** the inputs from the connected tools (your CRM / analytics / sheets).
+2. **Compute** the thing you actually care about — the trend, the funnel, the conversion rates, the summary.
+3. **Render** a forwardable output (a chat message, a doc, a filled sheet).
+
+**Then build it:**
+- Run it on my **real data**. Sanity-check one number by hand (LLMs confabulate — verify before trusting).
+- Show me the actual output; let me adjust.
+- **Save it as a skill**: write the SKILL.md to `~/.claude/skills/<name>/`. Confirm `/<name>` shows up when I type `/`.
+
+✅ **Win 4 — first aha**: *"You just built `/<name>`. Next time it's one command on live data. You didn't
+write code — you described the job and it became a tool."*
 
 ---
 
-## Step 5 — The moment: run your first real workflow (15 min)
+## Step 5 — Now build YOUR own (15 min)
 
-> **This is the point of everything above.** Say so: *"Okay — this is the part that makes it click.
-> That weekly task you mentioned in Step 0? Let's do it together, right now, on your real data."*
+> **Your turn to drive.** Step 4 I led; this one you steer — that's the real unlock.
 
-Run it like this:
-1. **Plan first** — show me the steps, let me adjust. Don't execute yet.
-2. **Execute step by step** on my real data, confirming as you go.
-3. **Produce a real, forwardable output** — a message, a doc, a filled sheet.
-4. **Then turn it into a skill**: *"Want next time to be one command? Let me save this as `/yourthing`."* Do it with me.
+**Why**: *"The point was never that one report. It's that anything you repeat can become a `/command`.
+Let's prove it on a task you pick."*
 
-🎉 **The aha**: *"You just did [the task] in [N] minutes — and next time it's literally one command:
-`/yourthing`. That's the whole idea: teach me a workflow once, and it's free every time after."*
+1. **Ask me**: *"What's another task you do on a schedule and wish ran itself?"*
+2. **Scope it with me**: what data, what output, how often. Plan before building.
+3. **Build + run it** on my real data, one step at a time.
+4. **Save it as a skill**, confirm it appears.
+5. If it's worth running unattended later, mention it can graduate to a scheduled job (cron) — but only after it's proven by hand a few times.
+
+🎉 **The aha**: *"That's two skills you built today. The pattern is the whole game: do a thing once with
+me → save it → it's free forever. Anything you repeat 3+ times is a candidate."*
 
 ---
 
 ## Where to go next (1 min)
 
 - Read `README.md` for the memory model + the three-tier agent architecture.
-- Suggest the next single tool to connect, based on what I reached for in Step 5.
-- Remind me of the rule that keeps this compounding: **anything I do 3+ times → ask you to make it a skill.**
+- Suggest the next single tool to connect, based on what we reached for in Steps 4-5.
+- The rule that keeps this compounding: **anything I do 3+ times → ask you to make it a skill.**
 - Give me ONE highest-leverage next step for my situation — not a list of ten.
 
 ---
@@ -141,6 +149,6 @@ Run it like this:
 ## Rules to hold throughout (re-read if you drift)
 
 - Why-then-do. One step at a time. Verify before advancing. Skip what I already have.
-- Get me to Step 5 — the first real workflow is the win that matters; everything before is setup.
+- The payoff is Steps 4-5 — real skills on my data. Everything before is setup.
 - Read official docs first when you hit an API you're unsure about.
 - **Prompts aren't the point — workflows and skills are.** Don't hand me prompt lists; build me things that run.
