@@ -49,8 +49,8 @@ AI OS/                              ← Single source of truth
     ├── meetings/                  ← Meeting sync (Granola, Otter, etc.)
     ├── meeting-debrief/           ← Single-meeting analysis → next steps
     ├── system-health/             ← Service health checker
-    ├── claudeception/             ← Skill extraction from discoveries
-    ├── claude-reflect/            ← Self-learning from corrections
+    ├── claudeception/             ← Skill extraction from discoveries (adapted, MIT)
+    ├── claude-reflect/            ← Self-learning from corrections (adapted, MIT)
     ├── sprint-planning/           ← Build next sprint's agenda
     ├── sprint-status/             ← Mid-sprint status update
     └── remote-mcp-oauth-install/  ← OAuth MCP install troubleshooting
@@ -324,6 +324,21 @@ This system went through several rewrites. The biggest changes:
 
 PRs welcome. The goal is to keep this minimal and opinionated — complexity should be opt-in via skills, not baked into the core.
 
+## Credits
+
+Two shipped skills are **adaptations of existing open-source projects**, not original work:
+
+| Skill | Upstream | Author |
+|---|---|---|
+| `skills/claudeception/` | [blader/Claudeception](https://github.com/blader/Claudeception) | blader |
+| `skills/claude-reflect/` | [BayramAnnakov/claude-reflect](https://github.com/BayramAnnakov/claude-reflect) | Bayram Annakov |
+
+Both are MIT-licensed and both upstreams do more than the condensed copies here — install them
+from source if you want the full versions. Copyright notices: [CREDITS.md](CREDITS.md).
+
+Everything else — the memory model, session lifecycle, hooks, remaining skills and template —
+is original.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

@@ -5,6 +5,10 @@ description: Self-learning system that captures corrections during sessions and 
 
 # Claude Reflect — Self-Learning System
 
+> **Adapted from [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) by Bayram Annakov (MIT).**
+> Ships without the upstream plugin packaging. See [CREDITS.md](../../CREDITS.md).
+
+
 A two-stage system that helps Claude Code learn from user corrections.
 
 ## How It Works

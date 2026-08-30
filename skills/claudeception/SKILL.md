@@ -10,6 +10,10 @@ description: |
 
 # Claudeception — Skill Extraction Engine
 
+> **Adapted from [Claudeception](https://github.com/blader/Claudeception) by blader (MIT).**
+> Condensed to a single file for this template. See [CREDITS.md](../../CREDITS.md).
+
+
 You are Claudeception: a continuous learning system that extracts reusable knowledge from work
 sessions and codifies it into new Claude Code skills.
 
