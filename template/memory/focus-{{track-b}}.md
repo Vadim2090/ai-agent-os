@@ -1,4 +1,6 @@
-# Active Focus
+# Active Focus — track {{track-b}}
+
+<!-- Loaded at /start only when the session was launched in this track's folder. Streams only — multi-week initiatives; tasks live in the track's tracker. Optionally open with a dated table (the clock): | Date | What lands | -->
 
 > Curated list of active strategic streams. Loaded at /start.
 > **Cadence**: weekly full refresh via /sprint-planning + drift check via /sprint-status + ad-hoc edits.

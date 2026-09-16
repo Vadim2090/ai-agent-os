@@ -1,22 +1,9 @@
-# Active Memory
+# Agent Memory Index
 
-<!-- This file is loaded into context at the start of every session.
-     Keep it concise — lines after 200 will be truncated by auto-memory.
-     Use separate topic files in memory/ for detailed notes. -->
+> Loaded into context at the start of every session. **Pointers only** — one line per memory,
+> `- [Title](file.md) — hook`. Detail goes in the topic file next to this one. Lines past ~200 are
+> silently truncated at load, so keep it lean and let `/start` warn you when it grows.
+> Format of a topic file: frontmatter (`name`, `description`, `type: user | feedback | project | reference`),
+> then the fact; for feedback and project notes add **Why:** and **How to apply:** lines.
 
-## Active Projects
-
-<!-- List your current projects with one-line status -->
-| Project | Status | Key metric |
-|---------|--------|------------|
-| {{project-name}} | {{status}} | {{metric}} |
-
-## Key Decisions
-
-<!-- Record decisions that affect how the agent should work -->
-- [date] {{Decision description}}
-
-## Patterns & Conventions
-
-<!-- Stable patterns confirmed across multiple sessions -->
-- {{Pattern description}}
+- [Example: how I like numbers reported](example-numbers-with-denominators.md) — every rate carries its base.

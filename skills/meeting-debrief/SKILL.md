@@ -32,9 +32,8 @@ User shares a meeting URL (Granola/Otter/Fireflies/Read.ai) AND says one of:
 
 ### Step 0: Load the radar
 Before fetching the meeting, load context:
-- `memory/focus.md` — active strategic streams
+- `memory/focus-<track>.md` — active strategic streams
 - Top entry of `memory/sessions-history.md` (use the awk slice from START.md) — last session's next steps + decisions
-- `memory/inbox.md` — captured items that may be affected
 
 Hold this as the baseline for Step 5's reconciliation. Don't include it in the visible output unless an item is affected by this meeting.
 
@@ -92,7 +91,7 @@ For each item include: who they need input from, deadline if mentioned, dependen
 Output **two tables in this order**:
 
 **Table 1: Reconciliation against existing items**
-For each baseline item (focus.md streams + sessions-history.md next-steps + inbox.md) that this meeting **affects**, classify:
+For each baseline item (focus-file streams + sessions-history.md next-steps) that this meeting **affects**, classify:
 - **DONE** — meeting confirms it's complete
 - **REVERSED** — meeting reverses the prior decision
 - **UPDATED** — tag/deadline/owner/blocker change only
@@ -102,7 +101,7 @@ Skip "unchanged" items (noise reduction).
 
 | # | Existing item | Source | Status | Proposed change |
 |---|---|---|---|---|
-| O1 | [item] | focus.md | DONE | Update focus.md: ... |
+| O1 | [item] | focus file | DONE | Update the focus file: ... |
 
 **Table 2: New Tasks Proposal**
 For action items surfaced by this meeting not already covered by Table 1.
@@ -119,7 +118,7 @@ Always close Step 5 with this exact line:
 Parse the reply for: `create T<n>` / `kill T<n>` / `O<n> confirm` / `O<n> skip` / `all approve`.
 
 Then:
-- Table 1 confirmed → surgical Edit to focus.md / inbox.md, or via task-tracker MCP
+- Table 1 confirmed → surgical Edit to the focus file, or via task-tracker MCP
 - Table 2 created → batch-create in task tracker (via Notion / Linear / Jira MCP)
 - Confirm with bullet list of created task URLs
 

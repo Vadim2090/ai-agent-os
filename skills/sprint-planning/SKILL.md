@@ -2,8 +2,8 @@
 name: sprint-planning
 description: |
   Build the next sprint's planning agenda. Reviews the last sprint's results,
-  carries forward unfinished work, and pulls new candidates from focus.md,
-  meetings.md, and your inbox.
+  carries forward unfinished work, and pulls new candidates from the track's focus file
+  and meetings.md.
   Use when: (1) user says /sprint-planning, "sprint planning", "plan next sprint",
   (2) at the start of a planning meeting (typically Monday morning),
   (3) you want a Notion-ready or Slack-ready agenda.
@@ -20,10 +20,9 @@ User says: `/sprint-planning`, "sprint planning", "plan the next sprint", "build
 
 ### Step 1: Load the radar
 Read in parallel:
-- `memory/focus.md` — active strategic streams (the portfolio view)
+- `memory/focus-<track>.md` — active strategic streams (the portfolio view)
 - `memory/sessions-history.md` (top entry via awk slice from START.md) — last session's "Next steps emerging" + decisions
 - `memory/meetings.md` — recent meeting commitments (last 2-3 entries)
-- `memory/inbox.md` — captured ideas that need a decision
 
 ### Step 2: Find the last sprint's data
 Search your task tracker (Notion / Linear / Jira / etc.) for the last sprint's page or backlog:
@@ -37,9 +36,8 @@ Ask the user to provide the link/ID if the page isn't easily findable.
 Build a candidate list from 4 sources:
 
 1. **Carry-forward** — unfinished from last sprint
-2. **New from streams** — items implied by active `focus.md` streams
+2. **New from streams** — items implied by the active focus file's streams
 3. **New from commitments** — action items from recent meetings (`meetings.md`)
-4. **Inbox promotions** — captured ideas the user wants to elevate to a sprint task
 
 For each candidate: title, source, why-now, success criteria, estimated effort.
 

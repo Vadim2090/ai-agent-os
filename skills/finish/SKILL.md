@@ -1,6 +1,6 @@
 ---
 name: finish
-description: Session wrap-up. Append session entry to sessions-history.md and (optionally) refresh focus.md if streams changed.
+description: Session wrap-up. Prepend the session entry to sessions-history.md (stamped with the track) and refresh the track's focus file only if streams changedd.
 ---
 
 # /finish — Session Wrap-Up
@@ -79,15 +79,11 @@ The 4-file memory model removed `handoff.md`. The "last session" is just the top
 
 These are NOT mandatory every /finish — only touch them when something genuinely changed:
 
-**focus.md** — only edit if a stream was started/paused/retired this session:
+**focus-<track>.md** (the launch track's file) — only edit if a stream was started/paused/retired this session:
 - Use Edit tool for surgical changes (add/remove a single bullet under a section, or move between sections)
-- Do not full-rewrite. Most sessions don't change focus.md.
+- Do not full-rewrite. Most sessions don't change the focus file.
 
-**inbox.md** — only append if user explicitly said "add to inbox: <X>" during the session:
-- Append one line per item: `- YYYY-MM-DD [tag] description`
 
-**references.md** — only edit if a new stable ID/URL/token was discovered AND user wants it persisted:
-- Use Edit tool to add to the right section.
 
 **MEMORY.md (auto-memory)** — review if anything from this session should update it:
 - New project started? → add to Active Projects list
@@ -100,7 +96,7 @@ These are NOT mandatory every /finish — only touch them when something genuine
 
 **MEMORY.md size** — count lines. If > 200, trim before close (move details to topic files, replace with pointers).
 
-**Clear WIP** — if `memory/wip.md` exists, delete it.
+**Stamp the entry** with `<!-- track: <track> -->` right under its heading, so /start can tell a foreign entry from continuity.
 
 ### Display format:
 
@@ -108,7 +104,6 @@ These are NOT mandatory every /finish — only touch them when something genuine
 SESSION [session name] WRAPPED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Logged to: sessions-history.md (top entry)
-focus.md updated: [yes/no]
-inbox additions: [count or "none"]
+focus file updated: [yes/no]
 Memory updated: [yes/no]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

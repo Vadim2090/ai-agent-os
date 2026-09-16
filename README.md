@@ -7,8 +7,8 @@ A second-brain operating system for **Claude Code**. Persistent memory across se
 AI coding agents are stateless by default. Every session starts from zero. This system fixes that:
 
 - **Session continuity** — `/start` loads previous context, `/finish` appends to a single audit trail
-- **Strategic memory** — `focus.md` holds active streams (the portfolio view), not a duplicate of your task tracker
-- **GTD inbox** — `inbox.md` captures during work without breaking flow; processed on demand
+- **Strategic memory** — one `focus-<track>.md` per track holds active streams (the portfolio view), not a duplicate of your task tracker
+- **Tracks by launch folder** — the folder you open Claude Code in decides which context loads; work and personal never mix
 - **Self-learning** — corrections are captured and applied to instructions via `/reflect`
 - **Skill extraction** — non-obvious discoveries become reusable skills via `/claudeception`
 - **Automated guardrails** — hooks enforce rules mechanically, not just documentation
@@ -27,14 +27,14 @@ AI OS/                              ← Single source of truth
 ├── data/                           ← Hybrid data layer (SQLite for structured, exports)
 ├── knowledge-base/                 ← Reference material
 │   └── ai-agent-principles.md     ← 5 principles + 3 pillars
-├── memory/                         ← 4-file memory model + meeting log
-│   ├── focus.md                   ← Active strategic streams (loaded at /start, weekly refresh)
-│   ├── inbox.md                   ← GTD capture buffer (manual triggers only)
-│   ├── references.md              ← Stable IDs, URLs, tokens (on-demand only)
-│   ├── sessions-history.md        ← Append-only timeline; top entry = "last session"
-│   └── meetings.md                ← Distilled meeting decisions/actions
-└── projects/                       ← Your project folders (each with README.md)
-    └── {project-name}/
+├── memory/                         ← session state, one focus file per track
+│   ├── focus-<track-a>.md         ← Active strategic streams, track A (loaded at /start when launched there)
+│   ├── focus-<track-b>.md         ← Active strategic streams, track B
+│   ├── sessions-history.md        ← Append-only timeline; top entry = "last session", stamped with its track
+│   ├── meetings.md                ← Distilled meeting decisions/actions
+│   └── archive/                   ← Superseded files, never loaded
+├── <track-a>/                      ← e.g. your employer's work: own CLAUDE.md, own task tracker
+└── <track-b>/                      ← e.g. personal projects: own CLAUDE.md, own task tracker
 
 ~/.claude/                          ← Claude Code configuration
 ├── settings.json                   ← Permissions + hooks
@@ -45,7 +45,6 @@ AI OS/                              ← Single source of truth
 └── skills/                         ← Installed skills
     ├── start/                     ← Session kickstart
     ├── finish/                    ← Session wrap-up (single-file shell-prepend)
-    ├── checkpoint/                ← Save mid-session state
     ├── meetings/                  ← Meeting sync (Granola, Otter, etc.)
     ├── meeting-debrief/           ← Single-meeting analysis → next steps
     ├── system-health/             ← Service health checker
@@ -63,25 +62,23 @@ AI OS/                              ← Single source of truth
 Every work session follows a strict open/close protocol:
 
 ```
-/start → loads context → work → /checkpoint (optional) → /finish → appends to history
+/start → loads the track's context → work → /finish → prepends the session entry to history
 ```
 
-This ensures no context is lost between sessions, regardless of which tool you use. The `/checkpoint` command saves mid-session state for parallel sessions.
+This ensures no context is lost between sessions, regardless of which tool you use. Hand-off between sessions runs through `/finish` and the top entry of `sessions-history.md` — there is no second "latest" file.
 
-### 2. The 4-File Memory Model
+### 2. The Memory Model
 
-The system separates **streams** (what you're operating on), **capture** (what to consider), **references** (what to look up), and **history** (what happened). Each file has one purpose. No duplication.
+The system separates **streams** (what you're operating on, per track) from **history** (what happened). Each file has one purpose. No duplication. Tasks live in your task tracker; stable IDs live in the agent's auto-memory.
 
 **Session memory** (`AI OS/memory/`):
 
 | File | Loaded at /start | Purpose |
 |------|------------------|---------|
-| `focus.md` | yes | Active strategic streams. Curated weekly via sprint planning. The portfolio view. |
-| `sessions-history.md` | yes (top entry only via shell slice) | Append-only timeline. The most recent entry serves "last session" context. |
-| `inbox.md` | counter only | GTD capture buffer. Only loaded on explicit "show inbox" / "process inbox". |
-| `references.md` | no | Stable IDs/URLs/tokens. On-demand only. |
-| `wip.md` | yes (if exists) | Mid-session state created by /checkpoint. Cleared by /finish. |
+| `focus-<track>.md` | yes — the launch track's file only | Active strategic streams for that track. The portfolio view. May open with a dated table ("the clock") that /start renders first. |
+| `sessions-history.md` | yes (top entry only via shell slice) | Append-only timeline. The most recent entry serves "last session" context; each entry is stamped with its track, so a foreign entry is never presented as continuity. |
 | `meetings.md` | no | Distilled meeting decisions/actions. On-demand. |
+| `archive/` | never | Superseded files, kept for recovery. |
 
 **Tasks do not live in memory.** They live in your real task tracker (Notion, Linear, Asana, etc.). Memory holds the strategic portfolio — what streams you're operating on this sprint. Tasks ≠ focus. Different cadence, different consumer, different tool.
 
@@ -211,7 +208,7 @@ Don't want to configure by hand? After cloning, **paste `ONBOARD.md` into a fres
 
 1. **Edit `AI OS/CLAUDE.md`** — fill in your identity, tools, domain knowledge, operational rules
 2. **Configure `content-guard.sh`** — add your domain-specific banned words (or remove if not needed)
-3. **Curate `focus.md`** — list 3-7 active strategic streams you're operating on this sprint
+3. **Curate `focus-<track>.md`** — list 3-7 active strategic streams you're operating on this sprint, one file per track
 4. **Connect a task tracker** — Notion, Linear, etc. Tasks live there, not in memory
 5. **Start a session**: open Claude Code in `AI OS/` and say `/start`
 6. **Build memory over time** — topic files accumulate naturally as you work on projects
@@ -286,21 +283,18 @@ To promote a skill to autonomous execution:
 | `data/` | Structured data layer (SQLite, exports) |
 | `IDEAS.md` | Idea backlog |
 | `knowledge-base/ai-agent-principles.md` | The 5 principles + 3 pillars |
-| `memory/focus.md` | Active strategic streams (the portfolio view) |
-| `memory/inbox.md` | GTD capture buffer (manual triggers only) |
-| `memory/references.md` | Stable IDs, URLs, tokens (on-demand only) |
-| `memory/sessions-history.md` | Append-only timeline; top entry = last session |
-| `memory/wip.md` | Work-in-progress state (created by /checkpoint, cleared by /finish) |
+| `memory/focus-<track>.md` | Active strategic streams, one file per track (the portfolio view) |
+| `memory/sessions-history.md` | Append-only timeline; top entry = last session, stamped with its track |
 | `memory/meetings.md` | Meeting decisions/actions log (synced via /meetings) |
+| `memory/archive/` | Superseded files, never loaded |
 | `settings.json.template` | Claude Code settings with hooks pre-wired |
 
 ## Skills Included
 
 | Skill | Purpose |
 |-------|---------|
-| `/start` | Load focus.md + top entry of sessions-history.md, surface inbox counter |
-| `/finish` | Append session entry to sessions-history.md (shell-prepend, single file) |
-| `/checkpoint` | Save mid-session state for parallel contexts |
+| `/start` | Detect the track from the launch folder, load its focus file + the top entry of sessions-history.md, run health checks |
+| `/finish` | Prepend the session entry to sessions-history.md (shell-prepend, single file), stamped with the track |
 | `/meetings` | Sync meeting notes from recording tools |
 | `/system-health` | Check all configured services in one shot |
 | `/reflect` | Review corrections, propose CLAUDE.md updates |
@@ -310,9 +304,13 @@ To promote a skill to autonomous execution:
 | `/meeting-debrief` | Analyze one meeting → filtered next steps + task proposal |
 | `/remote-mcp-oauth-install` | Fix OAuth-gated remote MCP installs ("where are my tools?" gotcha) |
 
-## Lessons From Three Months In
+## Lessons From a Year In
 
 This system went through several rewrites. The biggest changes:
+
+- **Split into tracks by launch folder (Sep 2026).** One `CLAUDE.md` had grown past 200 lines serving two jobs, and every session paid for both. Now the root file holds only what is true everywhere; each track folder carries its own `CLAUDE.md`, focus file and task tracker, and Claude Code's parent-directory loading does the routing. Confidential material from one track cannot leak into the other because it is never loaded there.
+- **Retired `inbox.md` and `/checkpoint`.** The inbox was a counter nobody acted on for three months — capture now goes straight to the relevant TODO. `wip.md` was a second "latest" file; hand-off runs through `/finish` and `sessions-history.md` alone.
+- **`/start` became optional.** It costs ~5K tokens and is worth it only when the session needs state; the mechanical checks (track, staleness, cross-track continuity, freshness) moved into a SessionStart hook that runs for free every time.
 
 - **Killed `handoff.md`.** It duplicated the top entry of `sessions-history.md`. Two files claiming to be "the latest" = torn-write race conditions when sessions ran in parallel.
 - **Moved tasks out of memory.** Tasks accumulated in handoff.md with carry counters going up to "carried x21". Items at x14+ aren't tasks — they're a museum of work never killed. The real task tracker (Notion) was always the answer.

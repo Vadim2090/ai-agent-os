@@ -28,7 +28,7 @@ For each planned item, determine its current status. Signals to use:
 - Task-tracker status (done / in-progress / blocked / not-started)
 - Recent git activity on related branches
 - Recent `meetings.md` entries mentioning the item
-- `focus.md` mentions of the parent stream
+- focus-file mentions of the parent stream
 
 Classify each into:
 - **Shipped** — done and delivered
@@ -40,7 +40,7 @@ Classify each into:
 ### Step 3: Identify unplanned work
 What did the user do this sprint that wasn't in the original plan? Check:
 - Recent `sessions-history.md` entries
-- `focus.md` changes since sprint start
+- focus-file changes since sprint start
 
 Categorize: **emergency** / **opportunity** / **scope-creep**.
 

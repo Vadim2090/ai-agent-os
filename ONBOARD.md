@@ -46,7 +46,7 @@ your skills. Let's create it properly so everything after just works."*
 
 1. If I haven't yet, have me run `./setup.sh` from this repo.
 2. **Verify the structure** — show me the tree and confirm each piece exists, explaining each in one line:
-   - `~/AI OS/` → `CLAUDE.md`, `memory/` (focus.md, inbox.md, references.md, sessions-history.md, meetings.md), `knowledge-base/`, `projects/`
+   - `~/AI OS/` → `CLAUDE.md`, `memory/` (focus-<track>.md per track, sessions-history.md, meetings.md, archive/), `knowledge-base/`, `projects/`
    - `~/.claude/skills/` (bundled skills), `~/.claude/hooks/` (guardrails), `~/.claude/settings.json` (hooks wired)
    If anything's missing, fix it with me before moving on — the rest assumes this layout.
 3. **Write my CLAUDE.md** — interview me one question at a time: name, role, what I'm driving (2-3 streams), how I like outputs, anything you must never say, key teammates + what they own. Write it in, show me, confirm it reads back right.

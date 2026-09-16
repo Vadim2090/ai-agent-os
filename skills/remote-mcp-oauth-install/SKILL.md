@@ -59,8 +59,7 @@ Step-by-step:
    "Authentication successful. Reconnected to <name>."
 
 3. **Save in-flight state** before exiting (CRITICAL — Claude's working context dies on restart):
-   - Write a short note to `memory/wip.md` describing what's open and what to test post-restart
-   - Or use the `checkpoint` skill if available
+   - Run `/finish` so the open items land in `sessions-history.md` before the restart
    - Skipping this step loses audit work, partial plans, etc.
 
 4. **Restart Claude Code**:
@@ -71,7 +70,7 @@ Step-by-step:
    MCP host re-handshakes with `<url>`, this time with the stored OAuth token, and
    the full tool list propagates into the deferred-tool registry.
 
-5. **Verify with `/start`** — it'll surface `wip.md` so you continue cleanly.
+5. **Verify with `/start`** — the top entry of `sessions-history.md` carries what was open.
 
 6. **Confirm tools loaded**:
    ```
@@ -114,7 +113,7 @@ Authentication successful. Reconnected to getsales.
 > /exit
 $ # relaunch claude code
 > /start
-[wip.md surfaces previous session]
+[/start surfaces the previous session's entry]
 > ToolSearch query="getsales" max_results=20
 [functional tools now present]
 ```
@@ -168,6 +167,6 @@ Other likely candidates that use this same pattern:
 
 ## See also
 
-- `memory/wip.md` pattern — for preserving in-session context across forced restarts
+- `/finish` before a forced restart — the session entry is the hand-off
 - `getsales-api-patterns` skill — fallback when MCP can't deliver (bulk ops, complex
   Elasticsearch queries)

@@ -1,128 +1,168 @@
-# AI Agent Instructions
+# AI OS — root agent instructions
 
-## WHO I AM
+> `AI OS/` is the single source of truth for my work. This file holds only what is true in **every**
+> session. Track-specific context lives one level down and loads on its own.
 
-### Identity
-- Name: {{YOUR_NAME}}
-- Role: {{YOUR_ROLE}} at {{YOUR_COMPANY}}
-- Default timezone: {{YOUR_TIMEZONE}}
-- Default language: English
+<!-- last_reviewed: {{YYYY-MM-DD}} — the /start health check flags this when it is >30 days old -->
 
-### Company context
-- Company: {{YOUR_COMPANY}}
-- Domain: {{YOUR_DOMAIN_DESCRIPTION}}
-- Operating model: {{HOW_YOUR_COMPANY_WORKS}}
+---
 
-### What I'm driving
-<!-- List 2-5 parallel workstreams you're actively managing -->
-- Stream 1: {{DESCRIPTION}}
-- Stream 2: {{DESCRIPTION}}
-- Stream 3: {{DESCRIPTION}}
+## 1 · SCOPE — the track is set by the launch folder
 
-### How I work (operating style)
-<!-- Keep the ones that apply, remove or replace the rest -->
-- Automation-first. I optimize for scalable workflows, minimal manual ops, and strong API capability.
-- High-signal execution. I prefer:
-  - crisp definitions (stages, tags, KPIs)
-  - structured outputs (tables, schemas, checklists)
-  - iterative delivery (v0 → v1 → v2), with obvious deltas
-- Practical simplicity beats elegance.
+Claude Code loads `CLAUDE.md` from the working directory **and every parent**. Files in
+subdirectories load lazily, the first time a file there is read. So where the session starts
+decides which context is live:
 
-### People & collaboration context
-<!-- List key collaborators and their roles -->
-- {{NAME}} — {{ROLE}}, {{WHAT_THEY_DO}}
-- {{NAME}} — {{ROLE}}, {{WHAT_THEY_DO}}
+| Launch in | Loads | Use for |
+|---|---|---|
+| `~/AI OS/{{Track A}}` | this file + `{{Track A}}/CLAUDE.md` | {{e.g. the day job: one employer, one client}} |
+| `~/AI OS/{{Track B}}` | this file + `{{Track B}}/CLAUDE.md` | {{e.g. personal projects, side venture, career}} |
+| `~/AI OS` (root) | this file only | System work, cross-track questions |
 
-## HOW TO COMMUNICATE
-- Be direct — skip pleasantries, get to the point
-- Prioritize accuracy over comfort
-- Executive summary first — for long responses, lead with key points
-- Structured outputs by default: tables, schemas, checklists
-- If I can forward it to a teammate as-is, that's a good output
+**Do not restate a track's rules here to "make sure they load."** If a rule from one track matters in
+a session, that session should have started in that track's folder — say so instead of duplicating.
 
-## FOLDER STRUCTURE
-This folder (`AI OS/`) is my single source of truth.
+**One track per session.** To switch, end the session and relaunch in the other folder.
+A track's confidential material never appears in the other track's files, chat, or shared surfaces.
 
-```
-AI OS/
-├── CLAUDE.md                  # This file (agent instructions)
-├── START.md                   # Session kickstart procedure
-├── MEMORY.md                  # Active projects, key decisions
-├── IDEAS.md                   # Ideas not yet promoted to projects
-├── data/                      # Hybrid data layer (SQLite for structured data)
-├── knowledge-base/            # Reference material
-│   └── ai-agent-principles.md
-├── memory/                    # 4-file memory model + meeting log
-│   ├── focus.md               # Active strategic streams (loaded at /start)
-│   ├── inbox.md               # GTD capture buffer (manual triggers only)
-│   ├── references.md          # Stable IDs, URLs, tokens (on-demand)
-│   ├── sessions-history.md    # Append-only timeline; top entry = "last session"
-│   └── meetings.md            # Distilled meeting decisions/actions (via /meetings)
-└── projects/                  # All project folders
-    └── {{project-name}}/
-```
+---
 
-### Memory model rules
-- **Tasks live in your real task tracker** (Notion, Linear, etc.) — NOT in any memory file
-- **`focus.md`** holds streams (multi-week initiatives), not individual tasks
-- **`inbox.md`** is GTD: capture during work, process later. Never auto-loaded.
-- **`references.md`** is on-demand only — keep it lean
-- **`sessions-history.md`** is append-only. The top entry serves as "last session" via shell slice.
+## 2 · FOLDERS
 
-### Naming convention
-- Format: `org-shortname` in kebab-case (e.g., `acme-crm`, `acme-marketing`)
-- Each project gets its own folder inside `projects/`
+| Path | Purpose |
+|---|---|
+| `CLAUDE.md` | This file — shared context only |
+| `START.md` | Session kickstart procedure (`/start`) |
+| `knowledge-base/` | Reference material — glossary, operating principles, reviews |
+| `memory/` | Session state. See §5 |
+| `{{Track A}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
+| `{{Track B}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
 
-### Keeping this in sync
-- When creating or renaming a project folder → update this tree AND `MEMORY.md`
-- When removing a project → remove from both
-- The `/finish` skill checks for drift automatically
+### Naming
 
-## TOOL-AGNOSTIC WORKFLOW
-Work must continue seamlessly across tools (Claude Code, Cursor, Claude.ai, etc.).
+Folders are kebab-case. **The prefix states what kind of thing it is** — read it before assuming
+where something lives:
 
-**Principles:**
-1. No tool lock-in — this folder works with any AI agent
-2. Single source of truth — all context lives here, not in tool-specific locations
-3. Graceful handoffs — any AI picks up where another left off via focus.md + top of sessions-history.md
-4. One project per session — don't mix contexts
-5. Tasks live in your task tracker, not in memory
+| Prefix | Means | Contains |
+|---|---|---|
+| `repo-*` | **A code repository** — a git checkout, usually with a remote | Source code. The second segment names the owner or the tool |
+| `{{org}}-*` | A workstream of that organisation | Docs, analysis, specs — not code |
+| *(no prefix)* | A one-off or cross-cutting piece of work | |
+| `archive/` | Retired. Never loaded, kept for recovery | Superseded projects and files |
 
-## CURRENT TOOLS & INTEGRATIONS
+⚠️ If a folder carries `repo-` without being a git repository, the name promises a checkout that is
+not there — verify before running any git operation against it.
 
-<!-- Fill in the tools you actually use -->
-| Tool | Purpose | Integration |
-|------|---------|-------------|
-| {{TOOL}} | {{PURPOSE}} | {{HOW_IT_CONNECTS}} |
+---
 
-> **API keys & secrets** are stored in environment files — never in .md files.
+## 3 · CONTEXT — who I am
 
-## DOMAIN KNOWLEDGE
+- **{{Name}}**, {{city}}. Timezone {{tz}}. Languages: {{languages}}.
+- {{One line of career shape: years, domains, what you do now.}}
+- **The through-line in my experience**: {{the one sentence that makes five roles read as range,
+  not drift — e.g. "building the system that produces the result, and the instrumentation that proves it did."}}
 
-<!-- Add domain-specific knowledge the agent needs -->
-### Key concepts
-- {{CONCEPT}}: {{DEFINITION}}
+### How I work
 
-### Agent guardrails
-<!-- Domain-specific rules the agent must follow -->
-- {{GUARDRAIL_1}}
-- {{GUARDRAIL_2}}
+- **Automation-first.** Scalable workflows, minimal manual ops, strong API capability.
+- **Data-first.** Data lives cleanly in the system of record and syncs to the analytics stack.
+- **High-signal execution**: crisp definitions, structured outputs, iterative delivery (v0 → v1 → v2)
+  with obvious deltas.
+- **Practical simplicity beats elegance.** When I ask for "the simplest way", do not propose a system.
 
-## FOR AI AGENTS
-Read this if you're an AI starting a session.
+### Self-described weaknesses — treat as operating instructions
 
-### What to read on session start
-See START.md for the full procedure.
+<!-- The most useful section in the file. Name your own, and for each one say what the agent should do about it. -->
+1. **{{e.g. Loses focus in long sessions; leaves things unfinished.}}** → Close deliverables. Name the one
+   next action. Do not open a fifth thread while three are half-done.
+2. **{{e.g. Buries the conclusion.}}** → Lead with the answer, then the reasoning. Never make me read to
+   the end to find out what happened.
+3. **{{e.g. Under-claims.}}** → When my own verified numbers are strong, say so plainly.
 
-### Session discipline
-- Every session starts with /start
-- Every session ends with /finish
-- Never mix multiple projects in one session
-- If switching projects, end current session first
-- **Memory model (4 files):**
-  - `focus.md` — active streams, loaded at /start
-  - `inbox.md` — GTD capture buffer, only loaded on explicit "show inbox" / "process inbox"
-  - `references.md` — stable IDs/URLs, only loaded on demand
-  - `sessions-history.md` — append-only timeline; top entry = last session (read at /start via awk slice)
-- /finish writes ONE file: prepends new entry to `sessions-history.md` via shell op. focus.md only edited if streams changed.
-- Tasks live in your real task tracker (Notion, Linear, etc.) — NOT in any memory file.
+---
+
+## 4 · RULES
+
+### Communicating
+
+- Direct. Skip pleasantries. Executive summary first.
+- Metrics questions get **numbers, not narratives**.
+- Structured outputs by default: tables, schemas, checklists.
+- If I can forward it to someone as-is, that is a good output.
+- **Answer from the data you have — don't route the question back to me.** "We should ask X" is not an
+  answer when the data already supports an estimate. Produce the number, label the assumption, flag
+  what would change it. Escalate only when the answer genuinely cannot be derived.
+- **Analysis docs read general → specific, primary → secondary.** Headline conclusion first.
+
+### Written artifacts
+
+- **One deliverable = one `.md` file.** Never split an analysis into a file per finding.
+- **One language in files — no exceptions.** Every `.md`, page, memory file, code comment, commit
+  message is written in {{English}}. Chat follows my language; **the chat language must never leak into
+  the file.** Verify before saving, e.g. for Cyrillic: `grep -nP '[\x{0400}-\x{04FF}]' <file>` must return nothing.
+  Quoted source material may stay in the original inside quotes; everything the agent authors is {{English}}.
+- A message in another language that has to *ship* (a chat note, a founder-to-founder message) is
+  drafted **in the chat**, not saved as a file, unless I ask otherwise.
+
+### Claims and numbers
+
+- **Claim discipline on every number.** *Built and ran* what you built and ran; *operated and optimised*
+  — never *personally sourced* — what the whole team produced. And **always state the denominator**:
+  a rate without its base can describe two completely different results.
+
+---
+
+## 5 · RUNTIME
+
+**Primary agent: Claude Code** (Desktop + CLI), built around its native features — skills, hooks,
+auto memory, path-scoped rules (`.claude/rules/`), MCP. Core context files are plain markdown,
+portable to any agent that reads files.
+
+**Principles**
+1. Single source of truth — context lives in this folder, not in tool-specific locations.
+2. Graceful handoffs — any session resumes from the track's focus file + the top of `sessions-history.md`.
+3. One track per session.
+4. Mechanically enforced — rules are hooks and scripts, not just prose.
+
+### Session state — `memory/`
+
+| File | Role | Loaded |
+|---|---|---|
+| `focus-{{track-a}}.md` · `focus-{{track-b}}.md` | Active strategic streams, one file per track | At `/start`, by track |
+| `sessions-history.md` | Append-only timeline; top entry = last session, stamped `<!-- track: X -->` | Top entry only, at `/start` |
+| `archive/` | Superseded files. Kept for recovery | Never |
+
+Tasks do **not** live here. They live in the tracker named by the active track's `CLAUDE.md`.
+Focus files hold **streams** — multi-week initiatives — not tasks.
+
+<!-- Retired after a year of use: inbox.md (a capture counter nobody acted on — capture goes straight to
+     the relevant TODO), wip.md and the /checkpoint command that wrote it (hand-off between sessions runs
+     through /finish and sessions-history.md), references.md (stable IDs belong in the agent's auto-memory). -->
+
+**These files are maintained by me.** Claude Code's own auto memory
+(`~/.claude/projects/<project>/memory/`) is a separate store for what the agent learns — corrections,
+preferences. **Do not mirror `memory/` content into it.**
+
+**Session flow**: `/start` to begin, `/finish` to wrap up.
+
+**`/start` loads state; it is worth its ~5K tokens only when the session needs state** — continuing
+prior work, a dated milestone on the horizon, or the first session in several days. A self-contained
+technical task does not need it. Everything mechanical — track detection, staleness, cross-track
+continuity, `CLAUDE.md` freshness, `MEMORY.md` size — runs in the SessionStart hook regardless.
+
+**Skills** load by scope: `~/.claude/skills/` (everywhere), `{{Track A}}/.claude/skills/` (that track
+only). Put a new skill where its scope is, not in the shared folder by default.
+
+**Subagents — choose by context need, not by task type.** One question decides it: *does the agent
+need what this session already knows?*
+- **Yes** → Agent tool **without** `subagent_type`. A fork inherits the parent's context and shares its
+  prompt cache. Never set `model` on a fork — a different model cannot reuse the cache.
+- **No** → a named `subagent_type`. It starts cold, and that is the point: a wide file sweep or a
+  research fan-out should hand back a conclusion, not drag its reading into this window.
+
+**Web tools — built-in by default, a semantic search tool when the query is about meaning.**
+Known public URL → built-in fetch. Keyword-shaped question → built-in search. Meaning-shaped
+question ("companies like X", "who has written about Y") → semantic search. Bulk URL enrichment →
+the provider's REST API directly, not the MCP.
+
+**Secrets** live in an environment file outside this folder — never in a `.md` file.
