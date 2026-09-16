@@ -1,7 +1,7 @@
 # AI OS — root agent instructions
 
-> `AI OS/` is the single source of truth for my work. This file holds only what is true in **every**
-> session. Track-specific context lives one level down and loads on its own.
+> `AI OS/` is the single source of truth. This file holds only what is true in **every** session.
+> Track-specific context lives one level down and loads on its own.
 
 <!-- last_reviewed: {{YYYY-MM-DD}} — the /start health check flags this when it is >30 days old -->
 
@@ -91,7 +91,7 @@ not there — verify before running any git operation against it.
 
 ### Self-described weaknesses — treat as operating instructions
 
-<!-- The most useful section in the file. Name your own, and for each one say what the agent should do about it. -->
+<!-- One line per weakness, each followed by the agent's counter-move. -->
 1. **{{e.g. Loses focus in long sessions; leaves things unfinished.}}** → Close deliverables. Name the one
    next action. Do not open a fifth thread while three are half-done.
 2. **{{e.g. Buries the conclusion.}}** → Lead with the answer, then the reasoning. Never make me read to
@@ -137,24 +137,13 @@ not there — verify before running any git operation against it.
 auto memory, path-scoped rules (`.claude/rules/`), MCP. Core context files are plain markdown,
 portable to any agent that reads files.
 
-**Principles** — the same three I have published; everything below implements them.
-
-> *An AI agent without context and feedback loops is like a pilot flying blind. You can still move fast,
-> but you can't trust the direction.*
-
-1. **Make the work visible to the agent.** The agent needs the same context you would give a human
-   teammate: decisions, plans, metrics, outputs. In practice: structured sessions (every session loads
-   prior context and saves it on exit — nothing is lost between sessions) and MCP integrations (the agent
-   reads the chat tool, the wiki, the CRM and meeting transcripts and queries APIs directly, so it decides
-   on real data and can verify its own results). Corollary: this folder is the single source of truth —
-   context lives here, not in tool-specific locations.
-2. **Fix the system, not the AI.** When the agent fails, check tooling, documentation and context
-   quality *before* rewriting prompts or switching models. In practice: an agent acting on outdated
-   information — people who had left, tools marked "evaluation" that were live — was fixed with
-   automated freshness checks that flag stale instructions and run drift detection, not with a new prompt.
-3. **Enforce structure mechanically.** Critical rules are checks and constraints that prevent violations
-   by default: hooks that scan every file write, a SessionStart hook that runs the health checks, one
-   track per session decided by the launch folder. **Written rules get forgotten. Automated checks don't.**
+**Principles**
+1. **Make the work visible to the agent.** Decisions, plans, metrics and outputs live in files here or in
+   systems reachable via MCP. Read them before asking. This folder is the single source of truth.
+2. **Fix the system, not the AI.** On a failure, check tooling, documentation and context freshness
+   before rewriting a prompt or switching models.
+3. **Enforce structure mechanically.** Hooks and scripts prevent violations; prose is documentation, not
+   the guard. One track per session, decided by the launch folder.
 
 ### Session state — `memory/`
 
@@ -167,9 +156,6 @@ portable to any agent that reads files.
 Tasks do **not** live here. They live in the tracker named by the active track's `CLAUDE.md`.
 Focus files hold **streams** — multi-week initiatives — not tasks.
 
-<!-- Retired after a year of use: inbox.md (a capture counter nobody acted on — capture goes straight to
-     the relevant TODO), wip.md and the /checkpoint command that wrote it (hand-off between sessions runs
-     through /finish and sessions-history.md), references.md (stable IDs belong in the agent's auto-memory). -->
 
 **These files are maintained by me.** Claude Code's own auto memory
 (`~/.claude/projects/<project>/memory/`) is a separate store for what the agent learns — corrections,
