@@ -26,7 +26,7 @@ AI OS/                              ← Single source of truth
 ├── IDEAS.md                        ← Idea backlog (not actionable yet)
 ├── data/                           ← Hybrid data layer (SQLite for structured, exports)
 ├── knowledge-base/                 ← Reference material
-│   └── ai-agent-principles.md     ← 5 principles + 3 pillars
+│   └── ai-agent-principles.md     ← 3 principles + 3 pillars
 ├── memory/                         ← session state, one focus file per track
 │   ├── focus-<track-a>.md         ← Active strategic streams, track A (loaded at /start when launched there)
 │   ├── focus-<track-b>.md         ← Active strategic streams, track B
@@ -169,13 +169,15 @@ Hooks run automatically on Claude Code events:
 | `content-guard.sh` | After Write/Edit | Scans output for banned words/phrases |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
 
-### 9. The 5 Principles
+### 9. The 3 Principles
 
-1. **Make everything visible to the agent** — all context in files, not in your head
-2. **Diagnose the environment, not the model** — fix tooling/docs, not the AI
-3. **Mechanically enforce structure** — hooks > written rules
-4. **Give the agent sensory access** — let it see results of its work
-5. **Provide a map, not a manual** — brief architecture > exhaustive docs
+> *An AI agent without context and feedback loops is like a pilot flying blind. You can still move fast, but you can't trust the direction.*
+
+1. **Make the work visible to the agent** — the same context you would give a human teammate: decisions, plans, metrics, outputs. Structured sessions plus MCP integrations, so it decides on real data and verifies its own results.
+2. **Fix the system, not the AI** — when the agent fails, check tooling, documentation and context quality before rewriting prompts or switching models.
+3. **Enforce structure mechanically** — critical rules are checks and constraints that prevent violations by default. Written rules get forgotten; automated checks don't.
+
+Full framework, with the three pillars underneath: `knowledge-base/ai-agent-principles.md`.
 
 ## Quick Start
 
@@ -282,7 +284,7 @@ To promote a skill to autonomous execution:
 | `START.md` | Session kickstart procedure (read by /start skill) |
 | `data/` | Structured data layer (SQLite, exports) |
 | `IDEAS.md` | Idea backlog |
-| `knowledge-base/ai-agent-principles.md` | The 5 principles + 3 pillars |
+| `knowledge-base/ai-agent-principles.md` | The 3 principles + 3 pillars |
 | `memory/focus-<track>.md` | Active strategic streams, one file per track (the portfolio view) |
 | `memory/sessions-history.md` | Append-only timeline; top entry = last session, stamped with its track |
 | `memory/meetings.md` | Meeting decisions/actions log (synced via /meetings) |

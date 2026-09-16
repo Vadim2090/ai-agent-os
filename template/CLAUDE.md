@@ -38,6 +38,25 @@ A track's confidential material never appears in the other track's files, chat, 
 | `{{Track A}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
 | `{{Track B}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
 
+```
+AI OS/
+├── CLAUDE.md                     ← this file: what is true in every session
+├── START.md                      ← /start procedure
+├── knowledge-base/               ← reference material (principles, glossary, reviews)
+├── memory/
+│   ├── focus-{{track-a}}.md      ← streams, track A (loaded at /start when launched there)
+│   ├── focus-{{track-b}}.md      ← streams, track B
+│   ├── sessions-history.md       ← append-only; top entry = last session, stamped with its track
+│   └── archive/                  ← superseded, never loaded
+├── {{Track A}}/
+│   ├── CLAUDE.md                 ← track rules and context; loads only when launched here
+│   ├── .claude/skills/           ← skills scoped to this track
+│   └── <org>-<workstream>/ · repo-<owner>-<tool>/ · archive/
+└── {{Track B}}/
+    ├── CLAUDE.md
+    └── <project>/ · repo-<tool>/ · archive/
+```
+
 ### Naming
 
 Folders are kebab-case. **The prefix states what kind of thing it is** — read it before assuming
@@ -118,11 +137,24 @@ not there — verify before running any git operation against it.
 auto memory, path-scoped rules (`.claude/rules/`), MCP. Core context files are plain markdown,
 portable to any agent that reads files.
 
-**Principles**
-1. Single source of truth — context lives in this folder, not in tool-specific locations.
-2. Graceful handoffs — any session resumes from the track's focus file + the top of `sessions-history.md`.
-3. One track per session.
-4. Mechanically enforced — rules are hooks and scripts, not just prose.
+**Principles** — the same three I have published; everything below implements them.
+
+> *An AI agent without context and feedback loops is like a pilot flying blind. You can still move fast,
+> but you can't trust the direction.*
+
+1. **Make the work visible to the agent.** The agent needs the same context you would give a human
+   teammate: decisions, plans, metrics, outputs. In practice: structured sessions (every session loads
+   prior context and saves it on exit — nothing is lost between sessions) and MCP integrations (the agent
+   reads the chat tool, the wiki, the CRM and meeting transcripts and queries APIs directly, so it decides
+   on real data and can verify its own results). Corollary: this folder is the single source of truth —
+   context lives here, not in tool-specific locations.
+2. **Fix the system, not the AI.** When the agent fails, check tooling, documentation and context
+   quality *before* rewriting prompts or switching models. In practice: an agent acting on outdated
+   information — people who had left, tools marked "evaluation" that were live — was fixed with
+   automated freshness checks that flag stale instructions and run drift detection, not with a new prompt.
+3. **Enforce structure mechanically.** Critical rules are checks and constraints that prevent violations
+   by default: hooks that scan every file write, a SessionStart hook that runs the health checks, one
+   track per session decided by the launch folder. **Written rules get forgotten. Automated checks don't.**
 
 ### Session state — `memory/`
 
