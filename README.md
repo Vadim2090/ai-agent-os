@@ -170,6 +170,7 @@ Three layers, because a rule written in `CLAUDE.md` is a request, not a guarante
 | `learning-activator.sh` | Every prompt | Reminds agent to evaluate for extractable knowledge |
 | `content-guard.sh` | After Write/Edit | Scans output for banned words/phrases |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
+| `done-gate.sh` | Stop | Re-runs the file checks (language leak outside quotes, secret patterns) on everything the session touched; blocks once, then lets a stated exception through |
 
 **Permissions** (`settings.json.template`) follow least privilege. There is no bare `Bash` allow: read-only
 commands run without prompting on their own, everything else runs inside the sandbox or asks. Secret files

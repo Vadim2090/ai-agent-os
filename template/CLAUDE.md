@@ -9,9 +9,7 @@
 
 ## 1 · SCOPE — the track is set by the launch folder
 
-Claude Code loads `CLAUDE.md` from the working directory **and every parent**. Files in
-subdirectories load lazily, the first time a file there is read. So where the session starts
-decides which context is live:
+Ancestors of the launch folder load at start; a subfolder's file loads when something there is read:
 
 | Launch in | Loads | Use for |
 |---|---|---|
@@ -129,6 +127,21 @@ not there — verify before running any git operation against it.
   — never *personally sourced* — what the whole team produced. And **always state the denominator**:
   a rate without its base can describe two completely different results.
 
+### Before you say done
+
+- Every number traces to a source you can name: file, query, dashboard tab. No source, no number.
+- Files: one deliverable per file, one language, checked before saving.
+- Name the one next action. If anything was skipped, say so in the first line.
+
+The `Stop` hook re-runs the file checks (language leak, secret patterns) on everything this session touched
+and blocks once if they fail. This list covers what a hook cannot see.
+
+### Autonomy
+
+| Always | Ask first | Never |
+|---|---|---|
+| Read, search, analyse, draft, edit files inside this folder | Push to a public remote, publish, write to a system of record, delete, spend money | Send, post, apply or reply as me on any external surface |
+
 ---
 
 ## 5 · RUNTIME
@@ -154,6 +167,13 @@ Focus files hold **streams** — multi-week initiatives — not tasks.
 preferences. **Do not mirror `memory/` content into it.**
 
 **Session flow**: `/start` to begin, `/finish` to wrap up.
+
+**How this file changes.** Corrections are captured by a hook during the session and folded in through
+`/reflect`. Same mistake twice → a rule here. A procedure pasted a third time → a skill. "Every time X"
+→ a hook. Do not hand-edit rules mid-session.
+
+**Budget.** This file stays under 200 lines, a skill under 500. Run `/context` when a session feels heavy
+and `/skill-doctor` for skills that never fire.
 
 **`/start` loads state; it is worth its ~5K tokens only when the session needs state** — continuing
 prior work, a dated milestone on the horizon, or the first session in several days. A self-contained

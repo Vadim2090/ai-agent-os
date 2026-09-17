@@ -37,15 +37,26 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
     "filesystem": {
-      "allowWrite": ["~/AI OS"]
+      "allowWrite": [
+        "~/AI OS"
+      ]
     },
     "credentials": {
       "files": [
-        { "path": "~/.ssh", "mode": "deny" },
-        { "path": "~/.aws/credentials", "mode": "deny" }
+        {
+          "path": "~/.ssh",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.aws/credentials",
+          "mode": "deny"
+        }
       ]
     },
-    "excludedCommands": ["osascript", "open"]
+    "excludedCommands": [
+      "osascript",
+      "open"
+    ]
   },
   "hooks": {
     "UserPromptSubmit": [
@@ -74,6 +85,17 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/content-guard.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/done-gate.sh",
+            "timeout": 30
           }
         ]
       }
