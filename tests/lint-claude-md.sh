@@ -3,9 +3,9 @@
 set -u
 cd "$(dirname "$0")/.."
 FAIL=0
-for f in template/CLAUDE.md template/START.md; do
+for f in template/AGENTS.md template/START.md; do
   lines=$(wc -l < "$f" | tr -d ' ')
-  if [ "$f" = "template/CLAUDE.md" ] && [ "$lines" -gt 200 ]; then echo "  $f: $lines lines (budget 200)"; FAIL=1; fi
+  if [ "$f" = "template/AGENTS.md" ] && [ "$lines" -gt 200 ]; then echo "  $f: $lines lines (budget 200)"; FAIL=1; fi
   if ! python3 tests/cyrillic.py "$f" >/dev/null; then echo "  $f: Cyrillic present"; FAIL=1; fi
 done
 # relative markdown links inside template/ must resolve (skip placeholders, urls and anchors)

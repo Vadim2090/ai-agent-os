@@ -42,4 +42,9 @@ if ! git diff --cached --quiet; then
   [ "${EVAL_PUSH:-0}" = "1" ] && git push -q origin main && echo "pushed"
 fi
 cat evals/LAST_RUN.md | head -12
-[ $T0_RC -eq 0 ] && [ $T1_RC -eq 0 ] && [ $T2_RC -eq 0 ]
+if [ $T0_RC -ne 0 ] || [ $T1_RC -ne 0 ] || [ $T2_RC -ne 0 ]; then
+  # Alert on failure only: a Tier 3 job that is quiet when green.
+  command -v osascript >/dev/null && osascript -e "display notification \"Tier 0 $(status $T0_RC), Tier 1 $(status $T1_RC), Tier 2 $(status $T2_RC)\" with title \"AI Agent OS evals failed\"" >/dev/null 2>&1
+  exit 1
+fi
+exit 0

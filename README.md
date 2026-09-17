@@ -21,10 +21,11 @@ AI coding agents are stateless by default. Every session starts from zero. This 
 
 ```
 AI OS/                              ← Single source of truth
-├── CLAUDE.md                       ← Agent instructions (identity, tools, rules, guardrails)
+├── AGENTS.md                       ← Agent instructions, canonical (open-standard name)
+├── CLAUDE.md → AGENTS.md           ← symlink, so Claude Code reads the same file
 ├── START.md                        ← Session kickstart procedure
 ├── IDEAS.md                        ← Idea backlog (not actionable yet)
-├── data/                           ← Hybrid data layer (SQLite for structured, exports)
+├── data/                           ← SQLite: schema.sql, sync_csv.py, README (section 3)
 ├── knowledge-base/                 ← Reference material
 │   └── ai-agent-principles.md     ← 3 principles + 3 pillars
 ├── memory/                         ← session state, one focus file per track
@@ -113,6 +114,10 @@ The agent reads markdown for context and queries SQLite for facts. Operational d
 > If you'd put it in a spreadsheet, it belongs in the DB.
 > If you'd write it as a paragraph, it stays in markdown.
 
+Shipped in `template/data/`: `schema.sql` (campaigns, daily funnel counts, experiments, and a monthly view with cost per
+qualified lead), `sync_csv.py` (a CSV export upserted into a table, safe to re-run, standard library only) and a README
+with the cron line. The database file is data; the schema is code.
+
 ### 4. Three-Tier Agent Architecture
 
 Not everything needs a human in the loop. As workflows prove reliable, promote them to higher autonomy:
@@ -142,6 +147,9 @@ Week 1: You manually run /system-health in Claude Code          → Tier 1
 Week 2: Cron runs it daily, posts to Slack, you review          → Tier 2
 Week 3: Cron runs silently, alerts only on failures             → Tier 3
 ```
+
+Shipped instance of Tier 3: `evals/run-all.sh` under launchd (`evals/routine/`), weekly, no person involved, a
+macOS notification only when a tier fails, results committed to `evals/LAST_RUN.md`.
 
 ### 5. Self-Learning Loop
 
@@ -226,7 +234,9 @@ prompts, a fresh agent, assertions on what it produced.
 
 `make eval-all` runs everything and writes [`evals/LAST_RUN.md`](evals/LAST_RUN.md) with the Claude Code
 version and the scores; `evals/routine/install.sh` schedules it weekly as a launchd agent, so the evidence
-stays current without a person at the keyboard or an API key. Fixtures are built outside the repo on
+stays current without a person at the keyboard or an API key. `make footprint` estimates what a session loads
+before the first prompt: CLAUDE.md ~2.6K tokens, the memory index plus every skill and agent description ~0.6K
+together; START.md (~1.4K) and the two rules load on demand. Fixtures are built outside the repo on
 purpose: Claude Code loads `CLAUDE.md` from every ancestor of the working directory, so a fixture inside
 the real tree inherits the real rules and tests nothing.
 
@@ -246,6 +256,11 @@ Why user scope: Claude Code loads `.claude/rules/` and `.claude/agents/` from th
 directory. Copies at the AI OS root never load in a track session (verified with a probe rule, 17 Sep 2026),
 and a rule for the sibling `memory/` folder cannot fire from a track at all; that procedure lives in the
 `/start` and `/finish` skills instead.
+
+### 12. Provenance: WHY.md
+
+Every hook, rule and structural decision traces to the incident that created it, with the date and what prevents
+it now: [`WHY.md`](WHY.md). A rule without a row there is a rule without a reason.
 
 ## Quick Start
 
@@ -364,6 +379,10 @@ To promote a skill to autonomous execution:
 | `settings.json.template` | Claude Code settings: least-privilege permissions, sandbox, hooks pre-wired |
 | `.claude-plugin/plugin.json` · `hooks/hooks.json` | Plugin manifest and hook wiring for `--plugin-dir` and `claude plugin eval` |
 | `tests/` · `Makefile` | Tier 0: static checks and hook unit tests (`make test`) |
+| `template/AGENTS.md` → `template/CLAUDE.md` | The instruction file, canonical under the open-standard name; CLAUDE.md is a symlink to it |
+| `WHY.md` | Every mechanism traced to the incident that created it |
+| `template/data/` | SQLite schema, CSV upsert script and the sync README |
+| `tests/footprint.sh` | Estimated tokens a session loads before the first prompt (`make footprint`) |
 | `template/.claude/rules/` · `template/.claude/agents/` | Path-scoped rules and subagents; `setup.sh` installs them into `~/.claude/` |
 | `evals/` | Tier 1 headless cases (`headless/run.py`), Tier 2 skill evals (`start/`, `finish/`), `run-all.sh`, the launchd routine, `LAST_RUN.md` |
 
