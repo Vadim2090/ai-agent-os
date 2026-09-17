@@ -137,14 +137,6 @@ not there — verify before running any git operation against it.
 auto memory, path-scoped rules (`.claude/rules/`), MCP. Core context files are plain markdown,
 portable to any agent that reads files.
 
-**Principles**
-1. **Make the work visible to the agent.** Decisions, plans, metrics and outputs live in files here or in
-   systems reachable via MCP. Read them before asking. This folder is the single source of truth.
-2. **Fix the system, not the AI.** On a failure, check tooling, documentation and context freshness
-   before rewriting a prompt or switching models.
-3. **Enforce structure mechanically.** Hooks and scripts prevent violations; prose is documentation, not
-   the guard. One track per session, decided by the launch folder.
-
 ### Session state — `memory/`
 
 | File | Role | Loaded |
