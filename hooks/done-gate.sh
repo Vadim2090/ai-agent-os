@@ -7,7 +7,7 @@
 #   2. secret pattern — API keys, tokens, private keys.
 # Files judged: every file the Write/Edit tools touched (from the transcript) plus every text file
 # modified since session start under the session's working directory, under <AI OS>/memory, and at the
-# top level of <AI OS>. Sibling tracks are not scanned.
+# top level of <AI OS>. Sibling tracks, archive/, worktrees/, tests/ and fixtures/ are not scanned.
 # On failure it blocks the stop ONCE (exit 2) and lists file:line, so the agent has to look.
 # The second stop passes (stop_hook_active), so a legitimate exception never loops.
 #
@@ -38,11 +38,19 @@ cwd = os.path.realpath(inp.get("cwd") or os.getcwd())
 transcript = os.path.expanduser(inp.get("transcript_path", ""))
 exts = set(os.environ["TEXT_EXTENSIONS"].split())
 max_bytes = int(os.environ["MAX_FILE_BYTES"])
-skip_dirs = {".git", "node_modules", ".venv", "venv", "__pycache__", "archive", "worktrees"}
+skip_dirs = {".git", "node_modules", ".venv", "venv", "__pycache__", "archive", "worktrees",
+             "tests", "test", "fixtures"}
 
 def is_text(path):
     ext = path.rsplit(".", 1)[-1].lower() if "." in os.path.basename(path) else ""
     return ext in exts
+
+def is_test_fixture(path):
+    # Test fixtures plant fake credentials and foreign text on purpose; flagging them teaches
+    # everyone to ignore the gate.
+    base = os.path.basename(path).lower()
+    return (base.startswith(("test-", "test_")) or base.rsplit(".", 1)[0].endswith(("_test", "-test"))
+            or any(seg in ("tests", "test", "fixtures") for seg in path.split(os.sep)))
 
 # 1. Session start and the files the Write/Edit tools touched, both from the transcript.
 start, touched = None, set()
@@ -93,15 +101,19 @@ except OSError:
 
 leak = os.environ.get("LANGUAGE_LEAK_REGEX", "")
 leak_re = re.compile(leak) if leak else None
-quoted_re = re.compile(r'"[^"\n]*"|«[^»\n]*»|`[^`\n]*`|\([^()\n]*\)')
+# Quoted material: "...", «...», `...`, (...) and [markdown link text] are not the agent's own prose.
+quoted_re = re.compile(r'"[^"\n]*"|«[^»\n]*»|`[^`\n]*`|\([^()\n]*\)|\[[^\]\n]*\]')
+# Word-anchored, so "risk-", "task-" or "desk-" never match the sk- prefix.
 secret_re = re.compile(
-    r"(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}"
-    r"|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----)"
+    r"(\bsk-[A-Za-z0-9_-]{20,}|\bAKIA[0-9A-Z]{16}|\bghp_[A-Za-z0-9]{36}|\bgithub_pat_[A-Za-z0-9_]{22,}"
+    r"|\bxox[abprs]-[A-Za-z0-9-]{10,}|\bAIza[0-9A-Za-z_-]{35}|\bntn_[A-Za-z0-9]{30,}"
+    r"|\bBearer\s+[A-Za-z0-9._~+/=-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----"
+    r"|(?i:\b(?:api[_-]?key|access[_-]?token|secret[_-]?key|client[_-]?secret)\b\s*[=:]\s*['\"]?[A-Za-z0-9._~+/-]{16,}))"
 )
 
 violations = {}
 for path in sorted(candidates):
-    if not is_text(path):
+    if not is_text(path) or is_test_fixture(path):
         continue
     try:
         st = os.stat(path)

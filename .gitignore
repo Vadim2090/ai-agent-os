@@ -21,3 +21,8 @@ credentials.json
 # Claude Code local
 CLAUDE.local.md
 learnings-queue.json
+
+# Tests and evals
+.tmp/
+evals/results/
+evals/.tmp/

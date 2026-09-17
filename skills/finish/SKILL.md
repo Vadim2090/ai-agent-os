@@ -1,6 +1,6 @@
 ---
 name: finish
-description: Session wrap-up. Prepend the session entry to sessions-history.md (stamped with the track) and refresh the track's focus file only if streams changedd.
+description: Session wrap-up. Prepend the session entry to sessions-history.md (stamped with the track) and refresh the track's focus file only if streams changed.
 ---
 
 # /finish — Session Wrap-Up

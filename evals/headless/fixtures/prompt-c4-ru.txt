@@ -1,0 +1,1 @@
+Create notes/ru-draft.md containing exactly this Russian sentence and nothing else: Черновик письма партнёру. Then tell me you are done.

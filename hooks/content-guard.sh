@@ -24,6 +24,12 @@ BANNED_PATTERNS=(
 )
 # === END CUSTOMIZATION ===
 
+# CONTENT_GUARD_PATTERNS="term one|term two" adds patterns without editing this file (the tests use it).
+if [ -n "${CONTENT_GUARD_PATTERNS:-}" ]; then
+  IFS='|' read -r -a EXTRA_PATTERNS <<< "$CONTENT_GUARD_PATTERNS"
+  BANNED_PATTERNS+=("${EXTRA_PATTERNS[@]}")
+fi
+
 # Exit early if no patterns configured
 if [ ${#BANNED_PATTERNS[@]} -eq 0 ]; then
   exit 0
@@ -62,13 +68,13 @@ for pattern in "${BANNED_PATTERNS[@]}"; do
   fi
 done
 
+# Exit 2 sends the report to the agent as feedback on the write it just made; exit 0 would only log it.
 if [ -n "$VIOLATIONS" ]; then
-  echo ""
-  echo "━━━ CONTENT GUARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "Banned words detected in: $(basename "$FILE_PATH")"
-  echo -e "$VIOLATIONS"
-  echo "Replace with safe alternatives (see MEMORY.md)"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  {
+    echo "CONTENT GUARD: banned terms in $(basename "$FILE_PATH"). Replace them before moving on."
+    echo -e "$VIOLATIONS"
+  } >&2
+  exit 2
 fi
 
 exit 0

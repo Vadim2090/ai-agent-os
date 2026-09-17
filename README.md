@@ -40,8 +40,9 @@ AI OS/                              ← Single source of truth
 ├── settings.json                   ← Least-privilege permissions, sandbox, hooks
 ├── hooks/                          ← Automated enforcement scripts
 │   ├── learning-activator.sh      ← Triggers skill extraction evaluation
-│   ├── content-guard.sh           ← Scans for banned words/phrases
-│   └── finish-staleness-check.sh  ← Warns if last session was >24h ago
+│   ├── content-guard.sh           ← Scans for banned words/phrases; a hit exits 2
+│   ├── finish-staleness-check.sh  ← Warns if last session was >24h ago
+│   └── done-gate.sh               ← Stop gate: language leak + secret patterns on files touched this session
 └── skills/                         ← Installed skills
     ├── start/                     ← Session kickstart
     ├── finish/                    ← Session wrap-up (single-file shell-prepend)
@@ -53,6 +54,13 @@ AI OS/                              ← Single source of truth
     ├── sprint-planning/           ← Build next sprint's agenda
     ├── sprint-status/             ← Mid-sprint status update
     └── remote-mcp-oauth-install/  ← OAuth MCP install troubleshooting
+
+ai-agent-os/ (this repo)            ← also loads as a plugin: claude --plugin-dir .
+├── .claude-plugin/plugin.json      ← manifest; hooks/hooks.json wires the hooks
+├── template/ · hooks/ · skills/    ← what setup.sh installs
+├── tests/                          ← Tier 0: static checks + hook unit tests (make test)
+├── evals/                          ← Tier 1 headless cases, Tier 2 skill evals, weekly routine, LAST_RUN.md
+└── Makefile                        ← test · eval · eval-skills · eval-all
 ```
 
 ## Core Concepts
@@ -168,8 +176,9 @@ Three layers, because a rule written in `CLAUDE.md` is a request, not a guarante
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `learning-activator.sh` | Every prompt | Reminds agent to evaluate for extractable knowledge |
-| `content-guard.sh` | After Write/Edit | Scans output for banned words/phrases |
+| `content-guard.sh` | After Write/Edit | Scans the written file for banned terms; a hit exits 2 so the report reaches the agent |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
+| `done-gate.sh` | Stop | Language leak outside quotes and secret patterns on everything the session touched; blocks once, lets a stated exception through |
 | `done-gate.sh` | Stop | Re-runs the file checks (language leak outside quotes, secret patterns) on everything the session touched; blocks once, then lets a stated exception through |
 
 **Permissions** (`settings.json.template`) follow least privilege. There is no bare `Bash` allow: read-only
@@ -200,6 +209,25 @@ would remove code-execution isolation. Bash deny rules alone are not a security 
 
 Full framework, with the three pillars underneath: `knowledge-base/ai-agent-principles.md`.
 
+### 10. Evals: instructions tested like code
+
+A `CLAUDE.md`, a hook or a skill is a rule for a system that keeps changing: you edit the file, Claude Code
+ships a release (this repo saw 2.1.270 → 2.1.274 in one afternoon), the model changes. Without tests the
+first sign of a broken rule is a broken session days later. So the rules are tested the way code is: fixed
+prompts, a fresh agent, assertions on what it produced.
+
+| Tier | What | Cost | When |
+|---|---|---|---|
+| 0 | `make test`: plugin and skill validation, settings structure, CLAUDE.md lint (200-line budget, language, dead links), a unit test for every hook on planted fixtures | free, seconds | every commit |
+| 1 | `make eval`: five golden prompts through `claude -p` against a throwaway AI OS built from `template/` (track scope, file language, secret deny, Stop gate, answer first); assertions on produced files, permission denials and the child transcript, never on prose | ~$0.50 | on change, weekly |
+| 2 | `make eval-skills`: `claude plugin eval` for `start` and `finish` against a no-plugin baseline, regex and tool-use graders, scaffolded fixtures | ~$0.20 per case-run | weekly |
+
+`make eval-all` runs everything and writes [`evals/LAST_RUN.md`](evals/LAST_RUN.md) with the Claude Code
+version and the scores; `evals/routine/install.sh` schedules it weekly as a launchd agent, so the evidence
+stays current without a person at the keyboard or an API key. Fixtures are built outside the repo on
+purpose: Claude Code loads `CLAUDE.md` from every ancestor of the working directory, so a fixture inside
+the real tree inherits the real rules and tests nothing.
+
 ## Quick Start
 
 ### Prerequisites
@@ -215,6 +243,8 @@ cd ai-agent-os
 chmod +x setup.sh
 ./setup.sh
 ```
+
+Or load it as a plugin for one session, nothing installed: `claude --plugin-dir .` from the clone.
 
 The setup script will:
 1. Create the `AI OS/` folder structure in your home directory (or a path you choose)
@@ -313,6 +343,9 @@ To promote a skill to autonomous execution:
 | `memory/meetings.md` | Meeting decisions/actions log (synced via /meetings) |
 | `memory/archive/` | Superseded files, never loaded |
 | `settings.json.template` | Claude Code settings: least-privilege permissions, sandbox, hooks pre-wired |
+| `.claude-plugin/plugin.json` · `hooks/hooks.json` | Plugin manifest and hook wiring for `--plugin-dir` and `claude plugin eval` |
+| `tests/` · `Makefile` | Tier 0: static checks and hook unit tests (`make test`) |
+| `evals/` | Tier 1 headless cases (`headless/run.py`), Tier 2 skill evals (`start/`, `finish/`), `run-all.sh`, the launchd routine, `LAST_RUN.md` |
 
 ## Skills Included
 
@@ -333,6 +366,7 @@ To promote a skill to autonomous execution:
 
 This system went through several rewrites. The biggest changes:
 
+- **Evals caught the harness before they caught a rule (Sep 2026).** First run: a fixture built under the real AI OS inherited the real `CLAUDE.md` through parent-directory loading, and a hook path with a space in it failed silently. Neither is visible without a fresh agent running fixed prompts. 5/5 and 2/2 after the fixes, $0.79 for the whole run.
 - **Dropped the bare `Bash` allow (Sep 2026).** The first template approved every shell command and denied nothing. Now secrets are denied to the file tools, destructive commands ask, and the sandbox contains everything else. Prompts went down, not up: read-only commands never asked, and sandboxed commands are auto-approved.
 - **Split into tracks by launch folder (Sep 2026).** One `CLAUDE.md` had grown past 200 lines serving two jobs, and every session paid for both. Now the root file holds only what is true everywhere; each track folder carries its own `CLAUDE.md`, focus file and task tracker, and Claude Code's parent-directory loading does the routing. Confidential material from one track cannot leak into the other because it is never loaded there.
 - **Retired `inbox.md` and `/checkpoint`.** The inbox was a counter nobody acted on for three months — capture now goes straight to the relevant TODO. `wip.md` was a second "latest" file; hand-off runs through `/finish` and `sessions-history.md` alone.

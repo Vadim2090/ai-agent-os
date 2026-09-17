@@ -1,3 +1,8 @@
+---
+name: system-health
+description: Unified health check across the services you configure (VPS, cron jobs, databases, APIs). Use when the user says /system-health, "check all services" or "health check". Produces one status report.
+---
+
 # /system-health — Unified Health Check
 
 ## Trigger
