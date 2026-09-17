@@ -14,7 +14,8 @@ T2_SUMMARY=$(python3 - "$T2_JSON" <<'PY' 2>/dev/null
 import json, sys
 try:
     d = json.load(open(sys.argv[1])); a = d.get("aggregates", {})
-    print(f"{a.get('casesPassed','?')}/{a.get('casesTotal','?')} cases at threshold, mean delta {a.get('meanDelta','?')}, ${d.get('costUsd',0):.2f}" + (" (partial)" if d.get("partial") else ""))
+    md = a.get("meanDelta"); md = f"{md:+.2f}" if isinstance(md, (int, float)) else "n/a"
+    print(f"{a.get('casesPassed','?')}/{a.get('casesTotal','?')} cases at threshold, mean delta vs no plugin {md}, ${d.get('costUsd',0):.2f}" + (" (partial)" if d.get("partial") else ""))
 except Exception as e:
     print(f"no result document ({e})")
 PY
