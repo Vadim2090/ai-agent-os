@@ -43,6 +43,8 @@ AI OS/                              ← Single source of truth
 │   ├── content-guard.sh           ← Scans for banned words/phrases; a hit exits 2
 │   ├── finish-staleness-check.sh  ← Warns if last session was >24h ago
 │   └── done-gate.sh               ← Stop gate: language leak + secret patterns on files touched this session
+├── rules/                          ← Path-scoped rules: repos.md (repo-*), research.md (research/)
+├── agents/                         ← Subagents: researcher (cold web research), fact-checker (numbers vs sources)
 └── skills/                         ← Installed skills
     ├── start/                     ← Session kickstart
     ├── finish/                    ← Session wrap-up (single-file shell-prepend)
@@ -228,6 +230,23 @@ stays current without a person at the keyboard or an API key. Fixtures are built
 purpose: Claude Code loads `CLAUDE.md` from every ancestor of the working directory, so a fixture inside
 the real tree inherits the real rules and tests nothing.
 
+### 11. Rules and subagents
+
+Two path-scoped rules and two subagents ship with the template and install into `~/.claude/`:
+
+| File | Loads when | Does |
+|---|---|---|
+| `rules/repos.md` | a file inside any `repo-*` folder is read | git etiquette: verify the checkout, no secrets staged, tests before "done", diff both ways before deploying |
+| `rules/research.md` | a file inside any `research/` folder is read | every claim sourced and dated, UNVERIFIED marked, denominators kept |
+| `agents/researcher.md` | called by name or delegated | cold, read-only web research; a sourced conclusion under 400 words |
+| `agents/fact-checker.md` | called by name or delegated | every number in a draft against its source; a verdict per claim |
+
+Why user scope: Claude Code loads `.claude/rules/` and `.claude/agents/` from the working directory and from
+`~/.claude/`, not from a parent folder, and a path-scoped rule fires only for files under the working
+directory. Copies at the AI OS root never load in a track session (verified with a probe rule, 17 Sep 2026),
+and a rule for the sibling `memory/` folder cannot fire from a track at all; that procedure lives in the
+`/start` and `/finish` skills instead.
+
 ## Quick Start
 
 ### Prerequisites
@@ -345,6 +364,7 @@ To promote a skill to autonomous execution:
 | `settings.json.template` | Claude Code settings: least-privilege permissions, sandbox, hooks pre-wired |
 | `.claude-plugin/plugin.json` · `hooks/hooks.json` | Plugin manifest and hook wiring for `--plugin-dir` and `claude plugin eval` |
 | `tests/` · `Makefile` | Tier 0: static checks and hook unit tests (`make test`) |
+| `template/.claude/rules/` · `template/.claude/agents/` | Path-scoped rules and subagents; `setup.sh` installs them into `~/.claude/` |
 | `evals/` | Tier 1 headless cases (`headless/run.py`), Tier 2 skill evals (`start/`, `finish/`), `run-all.sh`, the launchd routine, `LAST_RUN.md` |
 
 ## Skills Included

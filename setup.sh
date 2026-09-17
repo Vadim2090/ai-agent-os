@@ -31,6 +31,25 @@ else
   echo "  ✓ Created $AI_OS_PATH"
 fi
 
+# Step 2b: Rules and subagents live in user scope. Claude Code loads .claude/rules and .claude/agents
+# from the working directory and from ~/.claude, not from a parent folder, so a track session would never
+# see copies left at the AI OS root.
+echo "[1b/5] Installing rules and subagents to ~/.claude..."
+for kind in rules agents; do
+  mkdir -p "$HOME/.claude/$kind"
+  for f in "$SCRIPT_DIR/template/.claude/$kind/"*.md; do
+    [ -f "$f" ] || continue
+    NAME=$(basename "$f")
+    if [ -f "$HOME/.claude/$kind/$NAME" ]; then
+      echo "  ⚠  ~/.claude/$kind/$NAME already exists — skipping (won't overwrite)"
+    else
+      cp "$f" "$HOME/.claude/$kind/$NAME"
+      echo "  ✓ Installed $kind/$NAME"
+    fi
+  done
+done
+rm -rf "$AI_OS_PATH/.claude" 2>/dev/null
+
 # Step 3: Install hooks
 echo "[2/5] Installing hooks..."
 HOOKS_DIR="$HOME/.claude/hooks"

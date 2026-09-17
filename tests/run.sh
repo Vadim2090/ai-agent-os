@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 FAIL=0
 run() { local name="$1"; shift; if "$@"; then echo "PASS  $name"; else echo "FAIL  $name"; FAIL=1; fi; }
 run "plugin manifest, skills, hooks validate (--strict)" bash -c 'claude plugin validate . --strict >/dev/null 2>&1'
+run "template agents validate (--strict)"                 bash -c 'claude plugin validate template/.claude/agents --strict >/dev/null 2>&1'
 run "settings.json.template structure"               python3 tests/settings-check.py settings.json.template
 run "hooks/hooks.json is valid JSON"                  python3 -c 'import json,sys; json.load(open("hooks/hooks.json"))'
 run "CLAUDE.md lint (budget, language, links, placeholders)" bash tests/lint-claude-md.sh

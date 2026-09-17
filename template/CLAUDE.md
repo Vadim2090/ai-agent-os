@@ -27,15 +27,6 @@ A track's confidential material never appears in the other track's files, chat, 
 
 ## 2 · FOLDERS
 
-| Path | Purpose |
-|---|---|
-| `CLAUDE.md` | This file — shared context only |
-| `START.md` | Session kickstart procedure (`/start`) |
-| `knowledge-base/` | Reference material — glossary, operating principles, reviews |
-| `memory/` | Session state. See §5 |
-| `{{Track A}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
-| `{{Track B}}/` | Track folder. Own `CLAUDE.md`, own task tracker |
-
 ```
 AI OS/
 ├── CLAUDE.md                     ← this file: what is true in every session
@@ -179,6 +170,14 @@ and `/skill-doctor` for skills that never fire.
 prior work, a dated milestone on the horizon, or the first session in several days. A self-contained
 technical task does not need it. Everything mechanical — track detection, staleness, cross-track
 continuity, `CLAUDE.md` freshness, `MEMORY.md` size — runs in the SessionStart hook regardless.
+
+**Rules** live in `~/.claude/rules/` and load by path: `repos.md` inside any `repo-*` folder, `research.md`
+inside any `research/` folder. Claude Code loads rules and agents from the working directory and from
+`~/.claude`, not from a parent folder. This file keeps what is true everywhere.
+
+**Named subagents** in `~/.claude/agents/`: `researcher` (cold, read-only web, returns a sourced conclusion) and
+`fact-checker` (every number in a draft against its source). Call them by name; a fork stays for work that
+needs this session's context.
 
 **Skills** load by scope: `~/.claude/skills/` (everywhere), `{{Track A}}/.claude/skills/` (that track
 only). Put a new skill where its scope is, not in the shared folder by default.
