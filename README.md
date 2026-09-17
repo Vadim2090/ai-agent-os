@@ -37,7 +37,7 @@ AI OS/                              ← Single source of truth
 └── <track-b>/                      ← e.g. personal projects: own CLAUDE.md, own task tracker
 
 ~/.claude/                          ← Claude Code configuration
-├── settings.json                   ← Permissions + hooks
+├── settings.json                   ← Least-privilege permissions, sandbox, hooks
 ├── hooks/                          ← Automated enforcement scripts
 │   ├── learning-activator.sh      ← Triggers skill extraction evaluation
 │   ├── content-guard.sh           ← Scans for banned words/phrases
@@ -159,15 +159,35 @@ Meeting tool (Granola, Otter, etc.) ← source of truth for raw data
 memory/meetings.md ← distilled decisions, actions, commitments only
 ```
 
-### 8. Automated Guardrails (Hooks)
+### 8. Guardrails: hooks, permissions, sandbox
 
-Hooks run automatically on Claude Code events:
+Three layers, because a rule written in `CLAUDE.md` is a request, not a guarantee.
+
+**Hooks** run automatically on Claude Code events:
 
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `learning-activator.sh` | Every prompt | Reminds agent to evaluate for extractable knowledge |
 | `content-guard.sh` | After Write/Edit | Scans output for banned words/phrases |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
+
+**Permissions** (`settings.json.template`) follow least privilege. There is no bare `Bash` allow: read-only
+commands run without prompting on their own, everything else runs inside the sandbox or asks. Secret files
+are denied to the agent's file tools, so a `.env`, a key or `~/.claude.json` never lands in the context
+window, and pushing, recursive deletes and `sudo` always prompt:
+
+```json
+"ask":  ["Bash(git push *)", "Bash(rm -rf *)", "Bash(rm -r *)", "Bash(sudo *)"],
+"deny": ["Read(//**/.env)", "Read(//**/.env.*)", "Read(//**/*.pem)", "Read(~/.ssh/**)",
+         "Read(~/.aws/**)", "Read(~/.config/gh/**)", "Read(~/.claude.json)"]
+```
+
+**Sandbox** is the layer that holds when a prompt injection gets past the model: OS-level filesystem and
+network isolation for every Bash command and its children (macOS Seatbelt, Linux bubblewrap). Writes are
+limited to the working directory, the session temp directory and `~/AI OS`; no network host is allowed
+until you approve it once; `~/.ssh` and `~/.aws/credentials` are unreadable inside it. `osascript` and
+`open` are excluded because the macOS sandbox blocks Apple Events, and lifting that restriction globally
+would remove code-execution isolation. Bash deny rules alone are not a security boundary; the sandbox is.
 
 ### 9. The 3 Principles
 
@@ -242,7 +262,9 @@ BANNED_PATTERNS=(
 
 ### Adding Project-Specific Permissions
 
-Create `.claude/settings.local.json` in any project folder:
+Create `.claude/settings.local.json` in any project folder. Deny always wins over allow, so widening
+is additive and never re-opens a denied secret. To let a tool write somewhere else, add the path to
+`sandbox.filesystem.allowWrite`; to pre-approve a host, add it to `sandbox.network.allowedDomains`:
 
 ```json
 {
@@ -289,7 +311,7 @@ To promote a skill to autonomous execution:
 | `memory/sessions-history.md` | Append-only timeline; top entry = last session, stamped with its track |
 | `memory/meetings.md` | Meeting decisions/actions log (synced via /meetings) |
 | `memory/archive/` | Superseded files, never loaded |
-| `settings.json.template` | Claude Code settings with hooks pre-wired |
+| `settings.json.template` | Claude Code settings: least-privilege permissions, sandbox, hooks pre-wired |
 
 ## Skills Included
 
@@ -310,6 +332,7 @@ To promote a skill to autonomous execution:
 
 This system went through several rewrites. The biggest changes:
 
+- **Dropped the bare `Bash` allow (Sep 2026).** The first template approved every shell command and denied nothing. Now secrets are denied to the file tools, destructive commands ask, and the sandbox contains everything else. Prompts went down, not up: read-only commands never asked, and sandboxed commands are auto-approved.
 - **Split into tracks by launch folder (Sep 2026).** One `CLAUDE.md` had grown past 200 lines serving two jobs, and every session paid for both. Now the root file holds only what is true everywhere; each track folder carries its own `CLAUDE.md`, focus file and task tracker, and Claude Code's parent-directory loading does the routing. Confidential material from one track cannot leak into the other because it is never loaded there.
 - **Retired `inbox.md` and `/checkpoint`.** The inbox was a counter nobody acted on for three months — capture now goes straight to the relevant TODO. `wip.md` was a second "latest" file; hand-off runs through `/finish` and `sessions-history.md` alone.
 - **`/start` became optional.** It costs ~5K tokens and is worth it only when the session needs state; the mechanical checks (track, staleness, cross-track continuity, freshness) moved into a SessionStart hook that runs for free every time.
