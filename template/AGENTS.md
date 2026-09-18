@@ -179,7 +179,8 @@ inside any `research/` folder. Claude Code loads rules and agents from the worki
 needs this session's context.
 
 **Skills** load by scope: `~/.claude/skills/` (everywhere), `{{Track A}}/.claude/skills/` (that track
-only). Put a new skill where its scope is, not in the shared folder by default.
+only). Put a new skill where its scope is, not in the shared folder by default. MCP servers follow the same rule: a track's servers in its `.mcp.json`, user scope only for tools every
+track uses, because every server's tool schemas load into context.
 
 **Subagents — choose by context need, not by task type.** One question decides it: *does the agent
 need what this session already knows?*
