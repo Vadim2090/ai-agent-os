@@ -25,6 +25,7 @@ AI OS/                              ← Single source of truth
 ├── CLAUDE.md → AGENTS.md           ← symlink, so Claude Code reads the same file
 ├── START.md                        ← Session kickstart procedure
 ├── IDEAS.md                        ← Idea backlog (not actionable yet)
+├── profile.md                      ← Who I am, professionally; read on demand, never every session
 ├── data/                           ← SQLite: schema.sql, sync_csv.py, README (section 3)
 ├── knowledge-base/                 ← Reference material
 │   └── ai-agent-principles.md     ← 3 principles + 3 pillars
@@ -379,6 +380,7 @@ To promote a skill to autonomous execution:
 | `settings.json.template` | Claude Code settings: least-privilege permissions, sandbox, hooks pre-wired |
 | `.claude-plugin/plugin.json` · `hooks/hooks.json` | Plugin manifest and hook wiring for `--plugin-dir` and `claude plugin eval` |
 | `tests/` · `Makefile` | Tier 0: static checks and hook unit tests (`make test`) |
+| `template/profile.md` | Career, positioning, track record; opened only when the task is about the operator |
 | `template/AGENTS.md` → `template/CLAUDE.md` | The instruction file, canonical under the open-standard name; CLAUDE.md is a symlink to it |
 | `WHY.md` | Every mechanism traced to the incident that created it |
 | `template/data/` | SQLite schema, CSV upsert script and the sync README |

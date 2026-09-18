@@ -48,7 +48,7 @@ awk '/^## / { if (in_first) exit; in_first = 1 } in_first { print }' "$HOME/AI O
 **Already loaded automatically — do not re-read:** the root `CLAUDE.md`, the track's `CLAUDE.md`,
 and the auto-memory `MEMORY.md` index.
 
-**Do NOT load by default:** `memory/archive/**` · any project-specific file — not yet scoped.
+**Do NOT load by default:** `memory/archive/**` · any project-specific file — not yet scoped. · `profile.md` — only when the task is about me (a CV, a profile, an application).
 
 ### Health checks
 
