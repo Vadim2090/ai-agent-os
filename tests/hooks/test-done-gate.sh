@@ -3,7 +3,8 @@
 # leak at the root top level); sibling track, archive/ and worktrees/ untouched; stop_hook_active passes.
 set -u
 cd "$(dirname "$0")/../.."
-mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"  # not tests/ or .tmp/: the gate skips those on purpose; trap 'rm -rf "$T"' EXIT
+# Fixtures live in .scratch/, not tests/ or .tmp/: the gate skips those on purpose.
+mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/root/work/sub" "$T/root/memory" "$T/root/other" "$T/root/work/archive" "$T/root/work/.claude/worktrees/x"
 printf '{"timestamp":"2020-01-01T00:00:00Z"}\n{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Write","input":{"file_path":"%s/root/other/tool.md","content":"x"}}]}}\n' "$T" > "$T/t.jsonl"
 printf 'Clean.\nQuoted "\xd1\x82\xd0\xb5\xd0\xba\xd1\x81\xd1\x82" ok.\n(\xd1\x81\xd0\xbb\xd0\xbe\xd0\xb2\xd0\xbe) ok.\n' > "$T/root/work/ok.md"
