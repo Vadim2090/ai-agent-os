@@ -55,7 +55,7 @@ echo "[2/5] Installing hooks..."
 HOOKS_DIR="$HOME/.claude/hooks"
 mkdir -p "$HOOKS_DIR"
 
-for hook in "$SCRIPT_DIR/hooks/"*.sh; do
+for hook in "$SCRIPT_DIR/hooks/"*.sh "$SCRIPT_DIR/hooks/"*.py; do
   HOOK_NAME=$(basename "$hook")
   if [ -f "$HOOKS_DIR/$HOOK_NAME" ]; then
     echo "  ⚠  $HOOK_NAME already exists — skipping (won't overwrite)"

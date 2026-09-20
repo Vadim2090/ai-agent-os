@@ -123,8 +123,9 @@ not there — verify before running any git operation against it.
 - Files: one deliverable per file, one language, checked before saving.
 - Name the one next action. If anything was skipped, say so in the first line.
 
-The `Stop` hook re-runs the file checks (language leak, secret patterns) on everything this session touched
-and blocks once if they fail. This list covers what a hook cannot see.
+The `Stop` hook (`done-gate.sh`) re-checks the lines this session wrote (language leak, credentials by brand
+and shape) and blocks once per finding; what you acknowledge stays acknowledged until the line changes.
+`publish-guard.sh` scans a repository before any push. This list covers what a hook cannot see.
 
 ### Autonomy
 

@@ -10,7 +10,9 @@ run "settings.json.template structure"               python3 tests/settings-chec
 run "hooks/hooks.json is valid JSON"                  python3 -c 'import json,sys; json.load(open("hooks/hooks.json"))'
 run "CLAUDE.md lint (budget, language, links, placeholders)" bash tests/lint-claude-md.sh
 run "publish gates (secrets, identifiers, language)"  bash tests/gates.sh
+run "secretscan: shapes caught, prose not"            python3 tests/test-secretscan.py
 run "hook: done-gate"                                 bash tests/hooks/test-done-gate.sh
+run "hook: publish-guard"                             bash tests/hooks/test-publish-guard.sh
 run "hook: content-guard"                             bash tests/hooks/test-content-guard.sh
 run "hook: finish-staleness-check"                    bash tests/hooks/test-staleness.sh
 exit $FAIL
