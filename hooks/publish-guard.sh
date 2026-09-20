@@ -21,7 +21,7 @@ python3 - <<'PY'
 import json, os, re, subprocess, sys
 
 sys.path.insert(0, os.environ["HOOK_DIR"])
-from secretscan import scan_file
+from secretscan import scan_file, is_test_fixture
 
 inp = json.loads(os.environ.get("HOOK_INPUT") or "{}")
 if inp.get("tool_name") != "Bash":
@@ -43,13 +43,16 @@ try:
 except Exception:
     sys.exit(0)  # not a repository: nothing to guard here
 
-hits, env_files, scanned = [], [], 0
+hits, env_files, scanned, skipped = [], [], 0, 0
 for relpath in tracked:
     base = os.path.basename(relpath)
     if re.match(r"\.env(\..+)?$", base) and not base.endswith(".example"):
         env_files.append(relpath)
     path = os.path.join(top, relpath)
     if not os.path.isfile(path):
+        continue
+    if is_test_fixture(relpath):
+        skipped += 1      # fixtures plant fake credentials on purpose; the count is reported, not hidden
         continue
     scanned += 1
     for n, kind in scan_file(path):
@@ -65,6 +68,7 @@ if hits or env_files:
     sys.exit(2)
 
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
-      "additionalContext": f"publish-guard: {scanned} tracked file(s) in {os.path.basename(top)} scanned for credentials before publishing, clean."}}))
+      "additionalContext": f"publish-guard: {scanned} tracked file(s) in {os.path.basename(top)} scanned for credentials before publishing, clean"
+                           + (f"; {skipped} test fixture(s) skipped." if skipped else ".")}}))
 sys.exit(0)
 PY

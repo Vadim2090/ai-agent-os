@@ -77,6 +77,14 @@ def classify(line):
     return None
 
 
+def is_test_fixture(path):
+    """Test fixtures plant fake credentials on purpose; both gates skip them and say so."""
+    import os
+    base = os.path.basename(path).lower()
+    return (base.startswith(("test-", "test_")) or base.rsplit(".", 1)[0].endswith(("_test", "-test"))
+            or any(seg in ("tests", "test", "fixtures", "evals", ".tmp") for seg in path.split(os.sep)))
+
+
 def scan_file(path, max_bytes=2_000_000):
     """Yield (line_no, kind) for a text file; binaries and oversized files yield nothing."""
     try:
