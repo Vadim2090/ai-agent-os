@@ -2,7 +2,7 @@
 # finish-staleness-check: warns when sessions-history.md is older than 24 h, silent when fresh, silent when absent.
 set -u
 cd "$(dirname "$0")/../.."
-mkdir -p .tmp; T="$(mktemp -d "$PWD/.tmp/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
+mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"  # not tests/ or .tmp/: the gate skips those on purpose; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/memory"
 printf '# history\n' > "$T/memory/sessions-history.md"
 if [[ "$(uname)" == "Darwin" ]]; then touch -t "$(date -v-30H +%Y%m%d%H%M)" "$T/memory/sessions-history.md"; else touch -d '30 hours ago' "$T/memory/sessions-history.md"; fi

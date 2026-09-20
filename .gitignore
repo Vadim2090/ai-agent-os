@@ -24,5 +24,7 @@ learnings-queue.json
 
 # Tests and evals
 .tmp/
+.scratch/
 evals/results/
 evals/.tmp/
+.scratch/

@@ -189,7 +189,7 @@ Three layers, because a rule written in `CLAUDE.md` is a request, not a guarante
 | `learning-activator.sh` | Every prompt | Reminds agent to evaluate for extractable knowledge |
 | `content-guard.sh` | After Write/Edit | Scans the written file for banned terms; a hit exits 2 so the report reaches the agent |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
-| `done-gate.sh` | Stop | Language leak outside quotes and secret patterns on everything the session touched; blocks once, lets a stated exception through |
+| `done-gate.sh` | Stop | Language leak outside quotes, links and brackets, plus secret patterns (word-anchored: OpenAI, Notion, AWS, GitHub, Slack, Google, bearer and `token=` forms, private keys) on everything the session touched; blocks once, lets a stated exception through. A data file may waive the language check with `lang-check: data` in its first 4 KB; tests/ and fixtures are skipped |
 | `done-gate.sh` | Stop | Re-runs the file checks (language leak outside quotes, secret patterns) on everything the session touched; blocks once, then lets a stated exception through |
 
 **Permissions** (`settings.json.template`) follow least privilege. There is no bare `Bash` allow: read-only

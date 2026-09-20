@@ -25,6 +25,6 @@ sys.exit(1 if bad else 0)
 PYLINK
 then FAIL=1; fi
 # placeholders belong only under template/
-STRAY=$(grep -rln '{{' --include='*.md' --include='*.sh' --include='*.json' . --exclude-dir=template --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=evals --exclude-dir=tests --exclude-dir=.tmp | grep -v -e '^./README.md' -e '^./ONBOARD.md' -e 'hooks/hooks.json')
+STRAY=$(grep -rln '{{' --include='*.md' --include='*.sh' --include='*.json' . --exclude-dir=template --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=evals --exclude-dir=tests --exclude-dir=.tmp --exclude-dir=.scratch | grep -v -e '^./README.md' -e '^./ONBOARD.md' -e 'hooks/hooks.json')
 if [ -n "$STRAY" ]; then echo "  {{placeholder}} outside template/:"; sed 's/^/    /' <<< "$STRAY"; FAIL=1; fi
 exit $FAIL

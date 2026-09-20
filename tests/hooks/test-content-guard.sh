@@ -3,7 +3,7 @@
 # a non-text extension is skipped.
 set -u
 cd "$(dirname "$0")/../.."
-mkdir -p .tmp; T="$(mktemp -d "$PWD/.tmp/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
+mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"  # not tests/ or .tmp/: the gate skips those on purpose; trap 'rm -rf "$T"' EXIT
 printf 'This mentions forbidden-term in passing.\n' > "$T/bad.md"
 printf 'Nothing to see.\n' > "$T/ok.md"
 printf 'forbidden-term\n' > "$T/skip.png"
