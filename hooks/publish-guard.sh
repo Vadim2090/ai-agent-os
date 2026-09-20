@@ -34,9 +34,9 @@ if not PUBLISH.search(cmd):
 
 # The repository: a leading `cd <dir> &&` wins, otherwise the command's working directory.
 repo = inp.get("cwd") or os.getcwd()
-m = re.match(r"""\s*cd\s+("[^"]+"|'[^']+'|\S+)\s*(?:&&|;)""", cmd)
+m = re.match(r"""\s*cd\s+(.+?)\s*(?:&&|;)""", cmd)   # up to the first && or ; so a path with spaces survives
 if m:
-    repo = os.path.expanduser(os.path.expandvars(m.group(1).strip("\"'")))
+    repo = os.path.expanduser(os.path.expandvars(m.group(1).strip().strip("\"'")))
 try:
     top = subprocess.run(["git", "-C", repo, "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True).stdout.strip()
     tracked = [l for l in subprocess.run(["git", "-C", top, "ls-files", "--cached"], capture_output=True, text=True, check=True).stdout.split("\n") if l]

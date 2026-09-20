@@ -40,7 +40,7 @@ grep -q 'AKIA' "$T/state/acks.jsonl" && { echo "  run 2: the journal must not st
 printf '%s' "$J" | AI_OS_PATH="$R" bash hooks/done-gate.sh >/dev/null 2>&1 || { echo "  run 3: acknowledged findings should not block"; exit 1; }
 # 4. the acknowledged line changes -> new hash -> blocks again; the untouched acknowledgement is kept
 printf 'Clean line\n\xd1\x83\xd1\x82\xd0\xb5\xd1\x87\xd0\xba\xd0\xb0 authored and changed\n' > "$R/work/notes.md"
-sed -i '' 's/ authored\\\\n"}}/ authored and changed\\\\n"}}/' "$T/t.jsonl"
+printf '{"type":"assistant","timestamp":"2020-01-01T00:30:00Z","message":{"role":"assistant","content":[{"type":"tool_use","id":"e1","name":"Edit","input":{"file_path":"%s/work/notes.md","old_string":"authored","new_string":"\xd1\x83\xd1\x82\xd0\xb5\xd1\x87\xd0\xba\xd0\xb0 authored and changed"}}]}}\n' "$R" >> "$T/t.jsonl"
 OUT=$(printf '%s' "$J" | AI_OS_PATH="$R" bash hooks/done-gate.sh 2>&1); RC=$?
 [ "$RC" -eq 2 ] || { echo "  run 4: changed line should block again, got $RC"; echo "$OUT"; exit 1; }
 grep -q 'notes.md lines 2' <<< "$OUT" || { echo "  run 4: changed line not reported"; echo "$OUT"; exit 1; }
