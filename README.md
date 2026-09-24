@@ -44,7 +44,9 @@ AI OS/                              ← Single source of truth
 │   ├── learning-activator.sh      ← Triggers skill extraction evaluation
 │   ├── content-guard.sh           ← Scans for banned words/phrases; a hit exits 2
 │   ├── finish-staleness-check.sh  ← Warns if last session was >24h ago
-│   └── done-gate.sh               ← Stop gate: language leak + secret patterns on files touched this session
+│   ├── done-gate.sh               ← Stop gate: language leak + secret patterns on files touched this session
+│   ├── publish-guard.sh           ← Pre-publish credential scan for tracked repository files
+│   └── secretscan.py              ← Shared brand-and-shape credential detector
 ├── rules/                          ← Path-scoped rules: repos.md (repo-*), research.md (research/)
 ├── agents/                         ← Subagents: researcher (cold web research), fact-checker (numbers vs sources)
 └── skills/                         ← Installed skills
@@ -189,8 +191,9 @@ Three layers, because a rule written in `CLAUDE.md` is a request, not a guarante
 | `learning-activator.sh` | Every prompt | Reminds agent to evaluate for extractable knowledge |
 | `content-guard.sh` | After Write/Edit | Scans the written file for banned terms; a hit exits 2 so the report reaches the agent |
 | `finish-staleness-check.sh` | Session start | Warns if last session was >24h ago |
-| `done-gate.sh` | Stop | Language leak outside quotes, links and brackets, plus secret patterns (word-anchored: OpenAI, Notion, AWS, GitHub, Slack, Google, bearer and `token=` forms, private keys) on everything the session touched; blocks once, lets a stated exception through. A data file may waive the language check with `lang-check: data` in its first 4 KB; tests/ and fixtures are skipped |
-| `done-gate.sh` | Stop | Re-runs the file checks (language leak outside quotes, secret patterns) on everything the session touched; blocks once, then lets a stated exception through |
+| `done-gate.sh` | Stop | Checks lines and files written by this session for language leaks and credentials by known format or shape (`key = value`, high-entropy tokens). Each finding blocks once, then an acknowledged finding is journaled by line hash; changed lines block again. A data file may waive the language check with `lang-check: data` in its first 4 KB; tests and fixtures are skipped |
+| `publish-guard.sh` | PreToolUse on Bash | Before a repository-publishing command, scans tracked files for credentials by known format or shape and for tracked `.env` files; blocks with file and line details or reports a clean scan |
+| `secretscan.py` | Shared detector (not a hook) | Implements the credential checks used by both gates: known provider formats plus `key = value` and high-entropy-token shape rules |
 
 **Permissions** (`settings.json.template`) follow least privilege. There is no bare `Bash` allow: read-only
 commands run without prompting on their own, everything else runs inside the sandbox or asks. Secret files
