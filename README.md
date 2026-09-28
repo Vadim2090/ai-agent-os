@@ -28,7 +28,8 @@ AI OS/                              ← Single source of truth
 ├── profile.md                      ← Who I am, professionally; read on demand, never every session
 ├── data/                           ← SQLite: schema.sql, sync_csv.py, README (section 3)
 ├── knowledge-base/                 ← Reference material
-│   └── ai-agent-principles.md     ← 3 principles + 3 pillars
+│   ├── ai-agent-principles.md     ← 3 principles + 3 pillars
+│   └── orchestration.md           ← Rules for task layers, multiple agents, and multiple hosts
 ├── memory/                         ← session state, one focus file per track
 │   ├── focus-<track-a>.md         ← Active strategic streams, track A (loaded at /start when launched there)
 │   ├── focus-<track-b>.md         ← Active strategic streams, track B

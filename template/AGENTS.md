@@ -140,6 +140,7 @@ and shape) and blocks once per finding; what you acknowledge stays acknowledged 
 **Primary agent: Claude Code** (Desktop + CLI), built around its native features — skills, hooks,
 auto memory, path-scoped rules (`.claude/rules/`), MCP. Core context files are plain markdown,
 portable to any agent that reads files.
+Running agents through a task layer or other vendors: `knowledge-base/orchestration.md`.
 
 ### Session state — `memory/`
 
@@ -195,4 +196,4 @@ Known public URL → built-in fetch. Keyword-shaped question → built-in search
 question ("companies like X", "who has written about Y") → semantic search. Bulk URL enrichment →
 the provider's REST API directly, not the MCP.
 
-**Secrets** live in an environment file outside this folder — never in a `.md` file.
+**Secrets** live in 600-permission files outside this folder, never in a `.md`; each track's file names its own.
