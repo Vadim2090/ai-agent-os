@@ -267,6 +267,44 @@ and a rule for the sibling `memory/` folder cannot fire from a track at all; tha
 Every hook, rule and structural decision traces to the incident that created it, with the date and what prevents
 it now: [`WHY.md`](WHY.md). A rule without a row there is a rule without a reason.
 
+### 13. Task layer (Multica)
+
+Tasks live in a self-hosted Multica workspace. The markdown files hold the reasoning (principles, focus, decisions); Multica holds the work: owner, status and result. Full rules are in [`template/knowledge-base/orchestration.md`](template/knowledge-base/orchestration.md).
+
+**Entry points**
+
+| Entry point | What happens |
+|---|---|
+| Chat with the coordinator agent | Coordinator plans, creates issues, routes them |
+| Messaging-bot intake agent (always on, runs on a VPS) | Turns a message into an issue |
+| Issue created by hand | Assigned straight to the right role |
+| Scheduled autopilot | Creates a recurring issue on a timer |
+| Local Claude Code session | No issue; interactive work on the machine |
+
+**Roles**
+
+| Role | Responsibility |
+|---|---|
+| Coordinator | Routing and planning; never acts externally |
+| Builder | Code and configuration; one issue = one PR |
+| Reviewer | Independent PR review on a different model family; writes no code |
+| Writer | Drafts, specs, confidential synthesis |
+| Researcher | Sourced research and independent review |
+| Intake clerk | Bot message to issue |
+| Backup executors | On another vendor; used only when the main quota is exhausted |
+
+**Routing chains**
+
+- Code, then review as a separate issue.
+- Spec, then build.
+- Fact-check, then draft, then review for important external text.
+
+**Boundaries**
+
+- Every agent mention is a paid run, so mention only to hand over real work.
+- One level of delegation: a delegate does not delegate further.
+- External actions are drafted for a human to send, never sent by an agent.
+
 ## Quick Start
 
 ### Prerequisites
