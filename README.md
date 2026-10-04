@@ -269,7 +269,7 @@ it now: [`WHY.md`](WHY.md). A rule without a row there is a rule without a reaso
 
 ### 13. Task layer (Multica)
 
-Tasks live in a self-hosted [Multica](https://github.com/multica-ai/multica) workspace. The markdown files hold the reasoning (principles, focus, decisions); Multica holds the work: owner, status and result. Full rules are in [`knowledge-base/orchestration.md`](knowledge-base/orchestration.md).
+Tasks live in a self-hosted Multica workspace. The markdown files hold the reasoning (principles, focus, decisions); Multica holds the work: owner, status and result. Full rules are in [`knowledge-base/orchestration.md`](knowledge-base/orchestration.md).
 
 **Entry points**
 
