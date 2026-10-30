@@ -1,7 +1,7 @@
 #!/bin/bash
 # Publish gates for the public repo: secret patterns, employer identifiers, chat-language leaks.
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 FAIL=0
 SCOPE=(template README.md ONBOARD.md hooks skills settings.json.template setup.sh tests evals .claude-plugin)
 if grep -rnE '(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----)' "${SCOPE[@]}" --exclude-dir=results --exclude-dir=fixtures 2>/dev/null | grep -v -e 'tests/gates.sh' -e 'hooks/done-gate.sh' -e 'hooks/secretscan.py' -e 'test-done-gate.sh' -e 'test-secretscan.py' -e 'test-publish-guard.sh'; then echo "  secret pattern above"; FAIL=1; fi

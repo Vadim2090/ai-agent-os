@@ -2,7 +2,7 @@
 # Context footprint of what a session loads before the first prompt, estimated at 4 bytes per token.
 # Path-scoped rules and skill bodies load on demand, so only their descriptions count here.
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 est() { local b; b=$(cat "$@" 2>/dev/null | wc -c | tr -d ' '); printf "%5.1fK" "$(python3 -c "print($b/4/1000)")"; }
 printf "%-52s %s\n" "Always loaded" "tokens (est.)"
 printf "%-52s %s\n" "template/CLAUDE.md (= AGENTS.md)" "$(est template/AGENTS.md)"

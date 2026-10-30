@@ -3,10 +3,12 @@
 # Bash command of this session modified); a finding blocks once, the continuation acknowledges it in the
 # journal with the agent's reason, a changed line blocks again, --list / --forget-all work.
 set -u
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 1
 export TZ=UTC
 # Fixtures live in .scratch/, not tests/ or .tmp/: the gate skips those on purpose.
-mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
+mkdir -p .scratch || exit 1; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")" || exit 1; trap 'rm -rf "$T"' EXIT
+# Every fixture path below starts with $T; an empty or missing $T would write outside the temp dir.
+[ -n "$T" ] && [ -d "$T" ] || { echo "  mktemp failed"; exit 1; }
 export DONE_GATE_STATE="$T/state"
 R="$T/root"; mkdir -p "$R/work/sub" "$R/memory" "$R/other"
 # notes.md: the Write tool produced lines 1-2; line 3 was already there and is not this session's

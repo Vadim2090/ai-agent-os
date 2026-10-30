@@ -1,7 +1,7 @@
 #!/bin/bash
 # CLAUDE.md lint: budget, chat-language leak outside quotes, dead relative links, stray placeholders.
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 FAIL=0
 for f in template/AGENTS.md template/START.md; do
   lines=$(wc -l < "$f" | tr -d ' ')

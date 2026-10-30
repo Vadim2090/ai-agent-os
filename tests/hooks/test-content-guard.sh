@@ -2,9 +2,11 @@
 # content-guard: a banned term in a written .md exits 2 with the term on stderr; a clean file exits 0;
 # a non-text extension is skipped.
 set -u
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 1
 # Fixtures live in .scratch/, not tests/ or .tmp/: the gate skips those on purpose.
-mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
+mkdir -p .scratch || exit 1; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")" || exit 1; trap 'rm -rf "$T"' EXIT
+# Every fixture path below starts with $T; an empty or missing $T would write outside the temp dir.
+[ -n "$T" ] && [ -d "$T" ] || { echo "  mktemp failed"; exit 1; }
 printf 'This mentions forbidden-term in passing.\n' > "$T/bad.md"
 printf 'Nothing to see.\n' > "$T/ok.md"
 printf 'forbidden-term\n' > "$T/skip.png"

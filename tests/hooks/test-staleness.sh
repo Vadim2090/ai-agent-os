@@ -1,9 +1,11 @@
 #!/bin/bash
 # finish-staleness-check: warns when sessions-history.md is older than 24 h, silent when fresh, silent when absent.
 set -u
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 1
 # Fixtures live in .scratch/, not tests/ or .tmp/: the gate skips those on purpose.
-mkdir -p .scratch; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")"; trap 'rm -rf "$T"' EXIT
+mkdir -p .scratch || exit 1; T="$(mktemp -d "$PWD/.scratch/case.XXXXXX")" || exit 1; trap 'rm -rf "$T"' EXIT
+# Every fixture path below starts with $T; an empty or missing $T would write outside the temp dir.
+[ -n "$T" ] && [ -d "$T" ] || { echo "  mktemp failed"; exit 1; }
 mkdir -p "$T/memory"
 printf '# history\n' > "$T/memory/sessions-history.md"
 if [[ "$(uname)" == "Darwin" ]]; then touch -t "$(date -v-30H +%Y%m%d%H%M)" "$T/memory/sessions-history.md"; else touch -d '30 hours ago' "$T/memory/sessions-history.md"; fi

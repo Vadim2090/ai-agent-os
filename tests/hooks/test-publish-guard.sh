@@ -2,11 +2,19 @@
 # publish-guard: a push from a repository with a credential or a tracked .env is blocked (exit 2) with
 # file:line; a clean repository passes with a "scanned, clean" context line; other commands pass at once.
 set -u
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 1
 HOOK="$PWD/hooks/publish-guard.sh"
 # The fixture repository lives in the temp dir: inside the working tree the sandbox refuses to write .git/config.
-T="$(mktemp -d "${TMPDIR:-/tmp}/aios-pg.XXXXXX")"; trap 'rm -rf "$T" 2>/dev/null || true' EXIT
-git init -q --template= "$T/repo" && cd "$T/repo" && git config user.email t@example.com && git config user.name t
+T="$(mktemp -d "${TMPDIR:-/tmp}/aios-pg.XXXXXX")" || exit 1; trap 'rm -rf "$T" 2>/dev/null || true' EXIT
+# Every step below writes and commits files in $PWD. If any setup step fails, stop: never fall through to the
+# real repository (that is how a failed git init once replaced README.md with "hello" and committed it).
+[ -n "$T" ] && [ -d "$T" ] || { echo "  mktemp failed"; exit 1; }
+git init -q --template= "$T/repo" || { echo "  git init failed"; exit 1; }
+cd "$T/repo" || exit 1
+T="$(cd "$T" && pwd -P)"; case "$(pwd -P)" in "$T"/*) ;; *) echo "  not inside the temp dir: $PWD"; exit 1 ;; esac
+git rev-parse --show-toplevel | grep -qxF "$(pwd -P)" || { echo "  fixture is not its own repository"; exit 1; }
+git config user.email t@example.com || exit 1
+git config user.name t || exit 1
 printf 'PIPEDRIVE_API_TOKEN=0123456789abcdef0123456789abcdef01234567\n' > config.md
 printf 'hello\n' > README.md; mkdir -p tests; printf 'AKIAABCDEFGHIJKLMNOP\n' > tests/fixture.md; git add -A; git commit -qm init
 printf '{"tool_name":"Bash","tool_input":{"command":"ls -la"},"cwd":"%s"}' "$PWD" | bash "$HOOK" >/dev/null 2>&1 || { echo "  a non-publishing command must pass"; exit 1; }
