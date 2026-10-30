@@ -1,5 +1,9 @@
 # AI Agent OS — Personal AI Operating System
 
+[![test](https://github.com/Vadim2090/ai-agent-os/actions/workflows/test.yml/badge.svg)](https://github.com/Vadim2090/ai-agent-os/actions/workflows/test.yml)
+
+CI runs Tier 0 (`make test`) and a gitleaks secret scan on every push and pull request; Tier 1-2 evals run weekly via the local routine ([`evals/LAST_RUN.md`](evals/LAST_RUN.md)).
+
 A second-brain operating system for **Claude Code**. Persistent memory across sessions, a library of skills, MCP integrations to your real tools, automated guardrails, and a three-tier execution architecture. Core context files are plain markdown — portable to any agent.
 
 ## Why This Exists
