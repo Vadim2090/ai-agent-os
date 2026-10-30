@@ -28,3 +28,6 @@ learnings-queue.json
 evals/results/
 evals/.tmp/
 .scratch/
+
+# Python
+__pycache__/
