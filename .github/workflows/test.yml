@@ -1,0 +1,44 @@
+name: test
+
+# Tier 0 (static checks + hook unit tests) and a full-history secret scan.
+# Tier 1-2 evals call claude and cost money; they run weekly via the local routine (evals/LAST_RUN.md).
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tier0:
+    name: Tier 0 (make test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: make test
+        # No claude CLI on the runner: skip only the two `claude plugin validate` checks.
+        env:
+          TIER0_SKIP_CLAUDE: "1"
+        run: make test
+
+  gitleaks:
+    name: Secret scan (gitleaks, full history)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo"
+          ghcr.io/gitleaks/gitleaks:v8.30.1
+          git /repo --config /repo/.gitleaks.toml --redact --verbose

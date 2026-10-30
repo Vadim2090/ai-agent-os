@@ -1,0 +1,17 @@
+# Default gitleaks rules plus two narrow allowlists for fake credentials that exist on purpose.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Hook unit tests: fake AWS key and API token that the secret scanners must catch"
+paths = [
+  '''^tests/hooks/test-done-gate\.sh$''',
+  '''^tests/hooks/test-publish-guard\.sh$''',
+  '''^tests/test-secretscan\.py$''',
+]
+
+[[allowlists]]
+description = "config.md committed by the publish-guard test in 8eafed4 (fake token from the fixture)"
+condition = "AND"
+commits = ["8eafed41a0cc919e0ef85ffb4ffcd2826d735338"]
+paths = ['''^config\.md$''']
