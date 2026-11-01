@@ -104,14 +104,16 @@ def run_claude(cwd, prompt, allowed_tools, env_extra):
             continue
     data.setdefault("result", proc.stdout[-2000:] if not data else data.get("result", ""))
     data["_stderr"] = proc.stderr[-2000:]
+    data["_returncode"] = proc.returncode
     data["_seconds"] = round(time.time() - t0, 1)
     return data
 
 
 def completed(r):
-    # A case assertion is only meaningful on a run that finished: a timeout or a crash with no JSON result
-    # has no output and no transcript, so a negative check (canary absent) would pass on nothing.
-    return not r.get("_timeout") and bool(r.get("session_id"))
+    # A case assertion is only meaningful on a run that finished: a timeout, a crash with no JSON result or a CLI
+    # error result (API error, max turns) has no real answer, so a negative check (canary absent) would pass on nothing.
+    return (not r.get("_timeout") and bool(r.get("session_id")) and not r.get("is_error")
+            and r.get("_returncode", 0) == 0)
 
 
 def transcript_text(session_id):
@@ -184,7 +186,9 @@ CASES = [("C1 track scope", case_track_scope), ("C2 language rule", case_languag
 def attempt(fn, fx, work):
     ok, r, note = fn(fx, work)
     if not completed(r):
-        ok, note = False, f"run did not complete ({'timeout' if r.get('_timeout') else 'no session id'}); {note}"
+        why = ("timeout" if r.get("_timeout") else "no session id" if not r.get("session_id")
+               else "error result" if r.get("is_error") else f"exit {r.get('_returncode')}")
+        ok, note = False, f"run did not complete ({why}); {note}"
     return ok, r, note
 
 
