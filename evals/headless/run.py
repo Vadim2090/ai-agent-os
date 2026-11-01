@@ -91,7 +91,10 @@ def run_claude(cwd, prompt, allowed_tools, env_extra):
     env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
     env.update(env_extra)
     t0 = time.time()
-    proc = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=600)
+    try:
+        proc = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired:
+        return {"result": "timeout", "_stderr": "", "_seconds": round(time.time() - t0, 1)}
     out = proc.stdout.strip().splitlines()
     data = {}
     for line in reversed(out):
@@ -177,21 +180,26 @@ def main():
     fx = build_fixture()
     work = os.path.join(fx, "Work")
     results, cost, failed = [], 0.0, 0
-    for name, fn in CASES:
-        if only and not any(o in name for o in only):
-            continue
-        ok, r, note = fn(fx, work)
-        if not ok:  # one retry
+    try:
+        for name, fn in CASES:
+            if only and not any(o in name for o in only):
+                continue
             ok, r, note = fn(fx, work)
-        cost += float(r.get("total_cost_usd") or 0)
-        failed += 0 if ok else 1
-        results.append({"case": name, "pass": ok, "note": note, "seconds": r.get("_seconds"), "session_id": r.get("session_id"),
-                        "cost_usd": r.get("total_cost_usd"), "num_turns": r.get("num_turns"),
-                        "result_head": (r.get("result") or "")[:300], "stderr": r.get("_stderr", "")[:300]})
-        print(f"{'PASS' if ok else 'FAIL'}  {name:<18} {r.get('_seconds')}s  ${float(r.get('total_cost_usd') or 0):.3f}  {note}")
-        if not ok:
-            print("      result:", (r.get("result") or "")[:200].replace("\n", " | "))
-            if r.get("_stderr"): print("      stderr:", r["_stderr"][:200].replace("\n", " | "))
+            if not ok:  # one retry; keep the first attempt's cost
+                cost += float(r.get("total_cost_usd") or 0)
+                ok, r, note = fn(fx, work)
+            cost += float(r.get("total_cost_usd") or 0)
+            failed += 0 if ok else 1
+            results.append({"case": name, "pass": ok, "note": note, "seconds": r.get("_seconds"), "session_id": r.get("session_id"),
+                            "cost_usd": r.get("total_cost_usd"), "num_turns": r.get("num_turns"),
+                            "result_head": (r.get("result") or "")[:300], "stderr": r.get("_stderr", "")[:300]})
+            print(f"{'PASS' if ok else 'FAIL'}  {name:<18} {r.get('_seconds')}s  ${float(r.get('total_cost_usd') or 0):.3f}  {note}")
+            if not ok:
+                print("      result:", (r.get("result") or "")[:200].replace("\n", " | "))
+                if r.get("_stderr"): print("      stderr:", r["_stderr"][:200].replace("\n", " | "))
+    finally:
+        if not os.environ.get("EVAL_KEEP_FIXTURE"):
+            shutil.rmtree(fx, ignore_errors=True)
     os.makedirs(os.path.join(REPO, "evals", "results"), exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
     doc = {"kind": "headless", "timestamp": stamp, "model": MODEL, "fixture": fx,
@@ -200,8 +208,6 @@ def main():
     path = os.path.join(REPO, "evals", "results", f"headless-{stamp}.json")
     json.dump(doc, open(path, "w"), indent=2)
     print(f"\n{doc['passed']}/{doc['total']} passed, ${cost:.2f}, model {MODEL}, {doc['claude_version']}\nresults: {os.path.relpath(path, REPO)}")
-    if not os.environ.get("EVAL_KEEP_FIXTURE"):
-        shutil.rmtree(fx, ignore_errors=True)
     sys.exit(1 if failed else 0)
 
 
