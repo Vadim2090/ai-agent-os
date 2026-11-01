@@ -124,15 +124,21 @@ def transcript_text(session_id):
     return ""
 
 
-def new_text_files(root, since):
-    out = []
+def text_file_mtimes(root):
+    out = {}
     for dirpath, dirnames, files in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in (".git", "node_modules", ".claude")]
         for fn in files:
             p = os.path.join(dirpath, fn)
-            if fn.endswith((".md", ".txt")) and os.path.getmtime(p) >= since:
-                out.append(p)
+            if fn.endswith((".md", ".txt")):
+                out[p] = os.stat(p).st_mtime_ns
     return out
+
+
+def new_text_files(root, before):
+    # Files created or rewritten since the `before` snapshot. A snapshot, not a time window, so a file an earlier
+    # attempt wrote just before a retry is not credited to the retry.
+    return [p for p, m in text_file_mtimes(root).items() if before.get(p) != m]
 
 
 # ---------------------------------------------------------------- cases
@@ -145,10 +151,10 @@ def case_track_scope(fx, work):
 
 
 def case_language_rule(fx, work):
-    since = time.time()
+    before = text_file_mtimes(work)
     r = run_claude(work, fixture_text("prompt-c2-ru.txt"),
                    ["Read", "Write", "Edit", "Glob", "Grep"], {"AI_OS_PATH": fx})
-    files = new_text_files(work, since - 1)
+    files = new_text_files(work, before)
     leaks = [p for p in files if CYR.search(open(p, encoding="utf-8", errors="ignore").read())]
     ok = bool(files) and not leaks
     return ok, r, f"produced {len(files)} file(s), {len(leaks)} with Cyrillic"
@@ -202,15 +208,16 @@ def main():
             if only and not any(o in name for o in only):
                 continue
             ok, r, note = attempt(fn, fx, work)
+            case_cost = float(r.get("total_cost_usd") or 0)
             if not ok:  # one retry; keep the first attempt's cost
-                cost += float(r.get("total_cost_usd") or 0)
                 ok, r, note = attempt(fn, fx, work)
-            cost += float(r.get("total_cost_usd") or 0)
+                case_cost += float(r.get("total_cost_usd") or 0)
+            cost += case_cost
             failed += 0 if ok else 1
             results.append({"case": name, "pass": ok, "note": note, "seconds": r.get("_seconds"), "session_id": r.get("session_id"),
-                            "cost_usd": r.get("total_cost_usd"), "num_turns": r.get("num_turns"),
+                            "cost_usd": round(case_cost, 4), "num_turns": r.get("num_turns"),
                             "result_head": (r.get("result") or "")[:300], "stderr": r.get("_stderr", "")[:300]})
-            print(f"{'PASS' if ok else 'FAIL'}  {name:<18} {r.get('_seconds')}s  ${float(r.get('total_cost_usd') or 0):.3f}  {note}")
+            print(f"{'PASS' if ok else 'FAIL'}  {name:<18} {r.get('_seconds')}s  ${case_cost:.3f}  {note}")
             if not ok:
                 print("      result:", (r.get("result") or "")[:200].replace("\n", " | "))
                 if r.get("_stderr"): print("      stderr:", r["_stderr"][:200].replace("\n", " | "))
