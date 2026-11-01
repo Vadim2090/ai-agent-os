@@ -94,7 +94,7 @@ def run_claude(cwd, prompt, allowed_tools, env_extra):
     try:
         proc = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired:
-        return {"result": "timeout", "_stderr": "", "_seconds": round(time.time() - t0, 1)}
+        return {"result": "timeout", "_timeout": True, "_stderr": "", "_seconds": round(time.time() - t0, 1)}
     out = proc.stdout.strip().splitlines()
     data = {}
     for line in reversed(out):
@@ -106,6 +106,12 @@ def run_claude(cwd, prompt, allowed_tools, env_extra):
     data["_stderr"] = proc.stderr[-2000:]
     data["_seconds"] = round(time.time() - t0, 1)
     return data
+
+
+def completed(r):
+    # A case assertion is only meaningful on a run that finished: a timeout or a crash with no JSON result
+    # has no output and no transcript, so a negative check (canary absent) would pass on nothing.
+    return not r.get("_timeout") and bool(r.get("session_id"))
 
 
 def transcript_text(session_id):
@@ -175,6 +181,13 @@ CASES = [("C1 track scope", case_track_scope), ("C2 language rule", case_languag
          ("C3 secret deny", case_secret_deny), ("C4 done-gate", case_done_gate), ("C5 answer first", case_answer_first)]
 
 
+def attempt(fn, fx, work):
+    ok, r, note = fn(fx, work)
+    if not completed(r):
+        ok, note = False, f"run did not complete ({'timeout' if r.get('_timeout') else 'no session id'}); {note}"
+    return ok, r, note
+
+
 def main():
     only = sys.argv[1:]  # optional case-name substrings
     fx = build_fixture()
@@ -184,10 +197,10 @@ def main():
         for name, fn in CASES:
             if only and not any(o in name for o in only):
                 continue
-            ok, r, note = fn(fx, work)
+            ok, r, note = attempt(fn, fx, work)
             if not ok:  # one retry; keep the first attempt's cost
                 cost += float(r.get("total_cost_usd") or 0)
-                ok, r, note = fn(fx, work)
+                ok, r, note = attempt(fn, fx, work)
             cost += float(r.get("total_cost_usd") or 0)
             failed += 0 if ok else 1
             results.append({"case": name, "pass": ok, "note": note, "seconds": r.get("_seconds"), "session_id": r.get("session_id"),
