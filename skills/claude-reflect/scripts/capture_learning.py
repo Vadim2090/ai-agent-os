@@ -4,7 +4,7 @@ Capture Learning Hook — runs on UserPromptSubmit.
 Detects correction patterns in user messages and queues them
 for later processing via /reflect.
 
-Reads user message from stdin, writes to ~/.claude/learnings-queue.json.
+Reads the hook's JSON payload from stdin (user message under "prompt"), writes to ~/.claude/learnings-queue.json.
 """
 
 import json
@@ -70,9 +70,19 @@ def save_queue(queue: list):
 
 def main():
     try:
-        message = sys.stdin.read().strip()
+        raw = sys.stdin.read()
     except Exception:
         sys.exit(0)
+
+    # UserPromptSubmit sends a JSON object; the user's text is under "prompt".
+    try:
+        payload = json.loads(raw)
+    except ValueError:
+        payload = None
+    if isinstance(payload, dict):
+        message = str(payload.get("prompt") or "").strip()
+    else:
+        message = raw.strip()
 
     if not message:
         sys.exit(0)

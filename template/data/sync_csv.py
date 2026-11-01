@@ -20,7 +20,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "schema.sql")
 cols = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
 if not cols:
     sys.exit(f"unknown table {table!r}; tables: " + ", ".join(r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")))
-with open(csv_path, newline="", encoding="utf-8") as f:
+with open(csv_path, newline="", encoding="utf-8-sig") as f:
     reader = csv.DictReader(f)
     use = [c for c in reader.fieldnames if c in cols]
     if not use:
