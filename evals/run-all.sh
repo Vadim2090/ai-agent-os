@@ -39,7 +39,14 @@ status() { [ "$1" -eq 0 ] && echo "pass" || echo "FAIL (exit $1)"; }
 git add evals/LAST_RUN.md >/dev/null 2>&1
 if ! git diff --cached --quiet; then
   git commit -q -m "evals: run $STAMP" -m "Tier 0 $(status $T0_RC), Tier 1 $(status $T1_RC), Tier 2 $(status $T2_RC). Claude Code $VERSION." && echo "committed evals/LAST_RUN.md"
-  [ "${EVAL_PUSH:-0}" = "1" ] && git push -q origin main && echo "pushed"
+  # Push only from main, rebased on origin first: on another branch the commit stays local and says so.
+  if [ "${EVAL_PUSH:-0}" = "1" ]; then
+    if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
+      git pull -q --rebase origin main && git push -q origin main && echo "pushed" || echo "push FAILED: evals/LAST_RUN.md committed locally only"
+    else
+      echo "not on main: evals/LAST_RUN.md committed locally, not pushed"
+    fi
+  fi
 fi
 cat evals/LAST_RUN.md | head -12
 if [ $T0_RC -ne 0 ] || [ $T1_RC -ne 0 ] || [ $T2_RC -ne 0 ]; then
